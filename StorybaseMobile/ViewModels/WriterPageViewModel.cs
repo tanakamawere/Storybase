@@ -1,4 +1,5 @@
-﻿using StorybaseMobile.Pages;
+﻿using MvvmHelpers;
+using StorybaseMobile.Pages;
 
 namespace StorybaseMobile.ViewModels;
 
@@ -7,6 +8,7 @@ public partial class WriterPageViewModel : BaseViewModel
 {
     [ObservableProperty]
     private Writer writerSelected;
+    public ObservableRangeCollection<Book> Books { get; set; } = new();
 
     public WriterPageViewModel(IApiRepository api)
     {
@@ -19,6 +21,7 @@ public partial class WriterPageViewModel : BaseViewModel
         if (WriterSelected != null)
         {
             WriterSelected = await apiRepository.GetWriterProfileAsync(writerSelected.Id);
+            Books.ReplaceRange(WriterSelected.Books);
         }
     }
 

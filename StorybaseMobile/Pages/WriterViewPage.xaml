@@ -8,8 +8,13 @@
     xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
     xmlns:vm="clr-namespace:StorybaseMobile.ViewModels"
     Title="{Binding WriterSelected.Name}"
-    Shell.TabBarIsVisible="False"
-    x:DataType="vm:WriterPageViewModel">
+    x:DataType="vm:WriterPageViewModel"
+    Shell.TabBarIsVisible="False">
+
+    <ContentPage.Behaviors>
+        <toolkit:EventToCommandBehavior Command="{Binding LoadWriterCommand}" EventName="Appearing" />
+    </ContentPage.Behaviors>
+
 
     <ContentPage.Content>
         <StackLayout>
