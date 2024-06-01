@@ -6,11 +6,18 @@ public static class AuthEndpoints
     {
 
         //Register the user
-        app.MapPost(EndpointStrings.RegisterUser, async Task<Results<Ok<string>, BadRequest>> (AppDbContext context, IPasswordHasher passwordHasher, RegisterUserDto registerUser) =>
+        app.MapPost(EndpointStrings.RegisterUser, async Task<Results<Ok<LoginResponse>, BadRequest<LoginResponse>>> (AppDbContext context
+            , IPasswordHasher passwordHasher
+            , IJwtGenerator jwtGenerator
+            , RegisterUserDto registerUser) =>
         {
             if (await context.Users.AnyAsync(u => u.PhoneNumber == registerUser.PhoneNumber))
             {
-                return TypedResults.BadRequest();
+                return TypedResults.BadRequest(new LoginResponse()
+                {
+                    Message = "User already exists",
+                    Token = null
+                });
             }
 
             var user = new StorybaseUser
@@ -24,11 +31,15 @@ public static class AuthEndpoints
             context.Users.Add(user);
             await context.SaveChangesAsync();
 
-            return TypedResults.Ok("Registration successful");
+            return TypedResults.Ok(new LoginResponse()
+            {
+                Message = "new_user",
+                Token = null
+            });
         });
 
         //Login the user
-        app.MapPost(EndpointStrings.LoginUser, async Task<Results<Ok<string>, BadRequest>> (AppDbContext context,
+        app.MapPost(EndpointStrings.LoginUser, async Task<Results<Ok<LoginResponse>, BadRequest<LoginResponse>>> (AppDbContext context,
             IPasswordHasher passwordHasher,
             IJwtGenerator tokenService,
             LoginUserRequest loginUser) =>
@@ -37,12 +48,20 @@ public static class AuthEndpoints
 
                 if (user == null || !passwordHasher.VerifyHashedPassword(user.PasswordHash, loginUser.Password))
                 {
-                    return TypedResults.BadRequest();
+                    return TypedResults.BadRequest(new LoginResponse() 
+                    {
+                        Message = "Invalid login credentials",
+                        Token = null,
+                    });
                 }
 
                 var token = tokenService.GenerateToken(user.UserGuid, user.UserName, user.PhoneNumber, user.Role, "your_very_secret_key_here!@#$%^&*()", 30);
 
-                return TypedResults.Ok(token);
+                return TypedResults.Ok(new LoginResponse()
+                {
+                    Message = "Login successful",
+                    Token = token
+                });
             });
 
         return app;

@@ -24,15 +24,16 @@ public class ApiRepository : IApiRepository
         }
     }
     // Auth Endpoints
-    public async Task RegisterUserAsync(RegisterUserDto user)
+    public async Task<LoginResponse> RegisterUserAsync(RegisterUserDto user)
     {
-        await httpClient.PostAsJsonAsync(EndpointStrings.RegisterUser, user);
+        var response = await httpClient.PostAsJsonAsync(EndpointStrings.RegisterUser, user);
+        return await response.Content.ReadFromJsonAsync<LoginResponse>(); 
     }
 
-    public async Task<string> LoginUserAsync(LoginUserRequest user)
+    public async Task<LoginResponse> LoginUserAsync(LoginUserRequest user)
     {
         var response = await httpClient.PostAsJsonAsync(EndpointStrings.LoginUser, user);
-        return await response.Content.ReadFromJsonAsync<string>();
+        return await response.Content.ReadFromJsonAsync<LoginResponse>();
     }
 
     // Book Endpoints

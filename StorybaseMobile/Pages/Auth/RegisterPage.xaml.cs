@@ -1,9 +1,13 @@
+using StorybaseMobile.ViewModels;
+
 namespace StorybaseMobile.Pages.Auth;
 
 public partial class RegisterPage : ContentPage
 {
-	public RegisterPage()
+	public RegisterPage(RegisterViewModel viewModel)
 	{
 		InitializeComponent();
+
+		BindingContext = viewModel;
 	}
 }

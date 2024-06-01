@@ -4,9 +4,9 @@ namespace StorybaseLibrary.Interfaces;
 
 public interface IApiRepository
 {// Auth Endpoints
-    Task RegisterUserAsync(RegisterUserDto user);
+    Task<LoginResponse> RegisterUserAsync(RegisterUserDto user);
     //Returns Jwt
-    Task<string> LoginUserAsync(LoginUserRequest user);
+    Task<LoginResponse> LoginUserAsync(LoginUserRequest user);
 
     // Book Endpoints
     Task<IEnumerable<Book>> GetBooksAsync();
