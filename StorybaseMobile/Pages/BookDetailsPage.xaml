@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="StorybaseMobile.Pages.BookDetailsPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:fa="clr-namespace:UraniumUI.Icons.FontAwesome;assembly=UraniumUI.Icons.FontAwesome"
+    xmlns:models="clr-namespace:StorybaseLibrary.Models;assembly=StorybaseLibrary"
+    xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+    xmlns:vm="clr-namespace:StorybaseMobile.ViewModels"
+    Title="{Binding BookSelected.Title}"
+    x:DataType="vm:BookDetailsViewModel"
+    Shell.TabBarIsVisible="False">
+
+    <ContentPage.Behaviors>
+        <toolkit:EventToCommandBehavior Command="{Binding GetBookDetailsCommand}" EventName="Appearing" />
+    </ContentPage.Behaviors>
+
+
+    <ContentPage.Content>
+        <RefreshView Command="{Binding GetBookDetailsCommand}" IsRefreshing="{Binding IsBusy}">
+
+            <StackLayout>
+                <!--  Top section with cover image and writer button  -->
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="300" />
+                    </Grid.RowDefinitions>
+                    <Image
+                        Grid.Row="0"
+                        Aspect="AspectFill"
+                        Source="{Binding BookSelected.CoverImageUrl}" />
+                    <Button
+                        Margin="10"
+                        BackgroundColor="Transparent"
+                        BorderColor="White"
+                        BorderWidth="1"
+                        Command="{Binding GoToWriterCommand}"
+                        CommandParameter="{Binding BookSelected.Writer}"
+                        HorizontalOptions="End"
+                        Text="Go to Writer"
+                        TextColor="White"
+                        VerticalOptions="End" />
+                </Grid>
+
+                <!--  List of chapters  -->
+                <CollectionView Margin="10" ItemsSource="{Binding Chapters}">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="models:Chapter">
+                            <Border
+                                Margin="5"
+                                Padding="10"
+                                StrokeShape="RoundRectangle 20">
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:BookDetailsViewModel}}, Path=GoToChapterCommand}" CommandParameter="{Binding .}" />
+                                </Border.GestureRecognizers>
+                                <StackLayout>
+                                    <Label
+                                        FontAttributes="Bold"
+                                        FontSize="Medium"
+                                        Text="{Binding ChapterNumber}" />
+                                    <Label
+                                        FontSize="Medium"
+                                        LineBreakMode="TailTruncation"
+                                        MaxLines="2"
+                                        Text="{Binding Title}" />
+                                </StackLayout>
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </StackLayout>
+        </RefreshView>
+    </ContentPage.Content>
+</ContentPage>

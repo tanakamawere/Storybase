@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="StorybaseMobile.Pages.WriterViewPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:fa="clr-namespace:UraniumUI.Icons.FontAwesome;assembly=UraniumUI.Icons.FontAwesome"
+    xmlns:models="clr-namespace:StorybaseLibrary.Models;assembly=StorybaseLibrary"
+    xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+    xmlns:vm="clr-namespace:StorybaseMobile.ViewModels"
+    Title="{Binding WriterSelected.Name}"
+    Shell.TabBarIsVisible="False"
+    x:DataType="vm:WriterPageViewModel">
+
+    <ContentPage.Content>
+        <StackLayout>
+
+            <!--  Top section with writer details  -->
+            <Border
+                Margin="10"
+                Padding="10"
+                Stroke="LightGray"
+                StrokeShape="RoundRectangle 20">
+                <StackLayout>
+                    <Label
+                        FontAttributes="Bold"
+                        FontSize="Large"
+                        Text="{Binding WriterSelected.Name}" />
+                    <Label
+                        FontSize="Medium"
+                        LineBreakMode="WordWrap"
+                        Text="{Binding WriterSelected.Bio}" />
+                </StackLayout>
+            </Border>
+
+            <!--  Grid collection of writer's books  -->
+            <CollectionView ItemsSource="{Binding WriterSelected.Books}">
+                <CollectionView.ItemsLayout>
+                    <GridItemsLayout Orientation="Vertical" Span="3" />
+                </CollectionView.ItemsLayout>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="models:Book">
+                        <Border
+                            Margin="5"
+                            Padding="10"
+                            StrokeShape="RoundRectangle 20">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:WriterPageViewModel}}, Path=GoToBookDetailsCommand}" CommandParameter="{Binding .}" />
+                            </Border.GestureRecognizers>
+                            <StackLayout>
+                                <Image
+                                    Aspect="AspectFill"
+                                    HeightRequest="150"
+                                    Source="{Binding CoverImageUrl}" />
+                                <Label
+                                    Margin="5"
+                                    FontSize="Medium"
+                                    HorizontalOptions="Center"
+                                    Text="{Binding Title}"
+                                    VerticalOptions="Center" />
+                            </StackLayout>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+        </StackLayout>
+    </ContentPage.Content>
+
+</ContentPage>
