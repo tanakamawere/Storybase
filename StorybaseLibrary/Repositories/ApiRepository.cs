@@ -1,9 +1,6 @@
 ﻿using StorybaseLibrary.Interfaces;
 using StorybaseLibrary.Models;
 using StorybaseLibrary.Services;
-using System.Net.Http;
-using System.Text.Json;
-using System.Text;
 using System.Net.Http.Json;
 using System.Diagnostics;
 
@@ -113,9 +110,23 @@ public class ApiRepository : IApiRepository
         return await httpClient.GetFromJsonAsync<IEnumerable<Chapter>>($"{EndpointStrings.GetWriterChapters}?{nameof(writerId)}={writerId}");
     }
 
-    public async Task CreateWriterSignupAsync(Writer writer)
+    public async Task<bool> CreateWriterSignupAsync(WriterDto writer)
     {   
-        await httpClient.PostAsJsonAsync(EndpointStrings.CreateWriterSignup, writer);
+        var response = await httpClient.PostAsJsonAsync(EndpointStrings.CreateWriterSignup, writer);
+
+        if (response.IsSuccessStatusCode)
+        {
+            // Handle successful response (e.g., parse JSON data if necessary)
+            var responseContent = await response.Content.ReadAsStringAsync();
+            Console.WriteLine($"Question posted successfully! Response: {responseContent}");
+            return true; // Indicate successful posting
+        }
+        else
+        {
+            // Handle failed response with proper error handling
+            Console.WriteLine($"Error posting question: {response.StatusCode} - {await response.Content.ReadAsStringAsync()}");
+            return false; // Indicate posting failed
+        }
     }
 
     public async Task<IEnumerable<Writer>> SearchWritersAsync(string query)
@@ -126,5 +137,10 @@ public class ApiRepository : IApiRepository
     public async Task<Writer> GetWriterProfileAsync(int writerId)
     {
         return await httpClient.GetFromJsonAsync<Writer>($"{EndpointStrings.GetWriterProfile}?{nameof(writerId)}={writerId}");
+    }
+
+    public async Task<SearchResults> SearchAsync(string query)
+    {
+        return await httpClient.GetFromJsonAsync<SearchResults>($"{EndpointStrings.GetSearch}?query={query}");
     }
 }

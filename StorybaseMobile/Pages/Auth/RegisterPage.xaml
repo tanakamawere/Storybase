@@ -9,6 +9,7 @@
     xmlns:vm="clr-namespace:StorybaseMobile.ViewModels"
     Title="{Binding Title}"
     x:DataType="vm:RegisterViewModel"
+    Shell.NavBarIsVisible="False"
     Shell.TabBarIsVisible="False">
     <StackLayout Padding="30" Spacing="10">
         <Label

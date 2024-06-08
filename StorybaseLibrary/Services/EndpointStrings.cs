@@ -32,4 +32,7 @@ public class EndpointStrings
     public const string CreateWriterSignup = "api/writer/signup";
     public const string SearchWriters = "api/writer/search";
     public const string GetWriterProfile = "api/writer/profile";
+
+    //Search endpoint
+    public const string GetSearch = "api/search";
 }

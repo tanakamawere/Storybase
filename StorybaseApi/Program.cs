@@ -38,5 +38,6 @@ app.MapAuthEndpoints();
 app.MapChapterEndpoints();
 app.MapWriterEndpoints();
 app.MapBookEndpoints();
+app.MapGeneralEndpoints();
 
 app.Run();

@@ -40,16 +40,4 @@ public partial class HomePageViewModel : BaseViewModel
             IsBusy = false;
         }
     }
-
-    [RelayCommand]
-    public async Task GoToBookDetails(Book book)
-    {
-        if (book != null)
-        {
-            await Shell.Current.GoToAsync(nameof(BookDetailsPage), true, new Dictionary<string, object>
-            {
-                { "bookSelected", book }
-            });
-        }
-    }
 }

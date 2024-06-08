@@ -10,40 +10,18 @@
     Title="{Binding Title}"
     x:DataType="vm:HomePageViewModel">
 
-    <ContentPage.Resources>
-        <ResourceDictionary>
-            <DataTemplate x:Key="BookTemplate" x:DataType="models:Book">
-                <Grid>
-                    <Border Margin="5" StrokeShape="RoundRectangle 20">
-                        <Border.GestureRecognizers>
-                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:HomePageViewModel}}, Path=GoToBookDetailsCommand}" CommandParameter="{Binding .}" />
-                        </Border.GestureRecognizers>
-                        <StackLayout>
-                            <Image
-                                Aspect="AspectFill"
-                                HeightRequest="150"
-                                Source="{Binding CoverImageUrl}" />
-                            <Label
-                                Margin="5"
-                                FontAttributes="Bold"
-                                FontSize="Medium"
-                                HorizontalOptions="Center"
-                                Text="{Binding Title}"
-                                VerticalOptions="Center" />
-                        </StackLayout>
-                    </Border>
-                </Grid>
-            </DataTemplate>
-        </ResourceDictionary>
-    </ContentPage.Resources>
-
-
     <RefreshView IsRefreshing="{Binding IsBusy}">
         <Grid Padding="10">
             <CollectionView
                 EmptyView="There are no books here."
                 ItemTemplate="{StaticResource BookTemplate}"
                 ItemsSource="{Binding Books}">
+                <CollectionView.Header>
+                    <Label
+                        FontAttributes="Bold"
+                        FontSize="24"
+                        Text="Books for you" />
+                </CollectionView.Header>
                 <CollectionView.ItemsLayout>
                     <GridItemsLayout Orientation="Vertical" Span="3" />
                 </CollectionView.ItemsLayout>

@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Maui.Alerts;
 using CommunityToolkit.Maui.Core;
+using StorybaseMobile.Pages;
 using StorybaseMobile.Pages.Auth;
 using System.Diagnostics;
 
@@ -34,6 +35,7 @@ public partial class LoginViewModel : BaseViewModel
             if (response.Token != null)
             {
                 await SecureStorage.SetAsync("auth_token", response.Token);
+                await Shell.Current.GoToAsync($"//..");
             }
             else
             {

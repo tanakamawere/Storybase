@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="StorybaseMobile.Pages.SignUpAsWriterPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:fa="clr-namespace:UraniumUI.Icons.FontAwesome;assembly=UraniumUI.Icons.FontAwesome"
+    xmlns:models="clr-namespace:StorybaseLibrary.Models;assembly=StorybaseLibrary"
+    xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+    xmlns:vm="clr-namespace:StorybaseMobile.ViewModels"
+    Title="{Binding Title}"
+    x:DataType="vm:SignUpAsWriterViewModel"
+    Shell.TabBarIsVisible="False">
+    <ScrollView>
+        <StackLayout Padding="20">
+            <!--  Header  -->
+            <Label
+                FontAttributes="Bold"
+                FontSize="24"
+                HorizontalOptions="Center"
+                Text="Join Storybase as a Writer" />
+
+            <!--  Profile Picture  -->
+            <!--<StackLayout
+                Padding="0,20,0,20"
+                HorizontalOptions="Center"
+                Orientation="Vertical"
+                VerticalOptions="Center">
+                <Image
+                    Aspect="AspectFill"
+                    Clip="EllipseGeometry"
+                    HeightRequest="100"
+                    HorizontalOptions="Center"
+                    Source="profile_placeholder.png"
+                    VerticalOptions="Center"
+                    WidthRequest="100" />
+                <Button
+                    Padding="10"
+                    HorizontalOptions="Center"
+                    ImageSource="camera_icon.png"
+                    Text="Upload Profile Picture" />
+            </StackLayout>-->
+
+            <!--  Writer Signup Form  -->
+            <StackLayout Spacing="20">
+                <Entry
+                    x:Name="FullName"
+                    Placeholder="This will be your display name publicly"
+                    Text="{Binding Writer.Name}" />
+                <Entry
+                    x:Name="UserName"
+                    Placeholder="Your username will be displayed publicly as well"
+                    Text="{Binding Writer.UserName}" />
+                <Entry
+                    Keyboard="Telephone"
+                    Placeholder="WhatsApp Number"
+                    Text="{Binding Writer.ContactInfo}" />
+                <Entry
+                    x:Name="Biography"
+                    HeightRequest="100"
+                    Keyboard="{Binding Writer.Bio}"
+                    Placeholder="A short description of yourself"
+                    VerticalOptions="Start" />
+
+                <!--  Social Media Links  -->
+                <!--<Label FontAttributes="Bold" Text="Social Media Links" />
+                <Entry x:Name="FacebookProfile" Placeholder="Facebook Profile URL" />
+                <Entry x:Name="TwitterProfile" Placeholder="Twitter Profile URL" />
+                <Entry x:Name="InstagramProfile" Placeholder="Instagram Profile URL" />-->
+
+                <!--  Genre Selection  -->
+                <!--<Label FontAttributes="Bold" Text="Preferred Genres" />
+                <Picker x:Name="Genres" Title="Select Genres" />-->
+            </StackLayout>
+
+            <!--  Submit Button  -->
+            <Button
+                Command="{Binding SaveWriterCommand}"
+                CornerRadius="10"
+                Text="Submit"
+                TextColor="White" />
+        </StackLayout>
+    </ScrollView>
+</ContentPage>

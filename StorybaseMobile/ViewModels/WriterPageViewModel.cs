@@ -1,5 +1,4 @@
 ﻿using MvvmHelpers;
-using StorybaseMobile.Pages;
 
 namespace StorybaseMobile.ViewModels;
 
@@ -22,18 +21,6 @@ public partial class WriterPageViewModel : BaseViewModel
         {
             WriterSelected = await apiRepository.GetWriterProfileAsync(writerSelected.Id);
             Books.ReplaceRange(WriterSelected.Books);
-        }
-    }
-
-    [RelayCommand]
-    public async Task GoToBookDetails(Book book)
-    {
-        if (book != null)
-        {
-            await Shell.Current.GoToAsync(nameof(BookDetailsPage), true, new Dictionary<string, object>
-            {
-                { "bookSelected", book }
-            });
         }
     }
 }

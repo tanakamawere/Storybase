@@ -7,7 +7,10 @@
             //Search for writers
             app.MapGet(EndpointStrings.SearchWriters, async Task<Results<Ok<List<Writer>>, BadRequest>> (AppDbContext context, string query) =>
             {
-                var writers = await context.Writers.Where(w => w.Name.Contains(query)).ToListAsync();
+                var writers = await context.Writers.Where(w => w.Name.Contains(query))
+                .Where(w => w.UserName.Contains(query))
+                .Where(w => w.Bio.Contains(query))
+                .ToListAsync();
 
                 return TypedResults.Ok(writers);
             });
@@ -29,8 +32,17 @@
             });
 
             //Create a writer
-            app.MapPost(EndpointStrings.CreateWriterSignup, async Task<Results<Ok<string>, BadRequest>> (AppDbContext context, Writer writer) =>
+            app.MapPost(EndpointStrings.CreateWriterSignup, async Task<Results<Ok<string>, BadRequest>> (AppDbContext context, WriterDto writerDto) =>
             {
+                //Map the writer dto to a writer object
+                var writer = new Writer
+                {
+                    Name = writerDto.Name,
+                    UserName = writerDto.UserName,
+                    Bio = writerDto.Bio,
+                    ContactInfo = writerDto.ContactInfo
+                };
+
                 context.Writers.Add(writer);
                 await context.SaveChangesAsync();
 

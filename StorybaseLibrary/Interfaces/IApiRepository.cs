@@ -29,7 +29,10 @@ public interface IApiRepository
     // Writer Endpoints
     Task<IEnumerable<Book>> GetWriterBooksAsync(int writerId);
     Task<IEnumerable<Chapter>> GetWriterChaptersAsync(int writerId);
-    Task CreateWriterSignupAsync(Writer writer);
+    Task<bool> CreateWriterSignupAsync(WriterDto writer);
     Task<IEnumerable<Writer>> SearchWritersAsync(string query);
     Task<Writer> GetWriterProfileAsync(int writerId);
+
+    // Search endpoint
+    Task<SearchResults> SearchAsync(string query);
 }

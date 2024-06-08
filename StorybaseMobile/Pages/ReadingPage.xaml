@@ -11,6 +11,17 @@
     x:DataType="vm:ReadingViewModel"
     Shell.TabBarIsVisible="False">
 
+    <ContentPage.ToolbarItems>
+        <ToolbarItem
+            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ReadingViewModel}}, Path=OpenSettingsBottomSheetCommand}"
+            IconImageSource="{FontImageSource FontFamily=FASolid,
+                                              Glyph={x:Static fa:Solid.Wrench},
+                                              Color={AppThemeBinding Light={StaticResource Primary},
+                                                                     Dark={StaticResource White}}}"
+            Text="Settings" />
+
+    </ContentPage.ToolbarItems>
+
     <ContentPage.Content>
         <StackLayout>
 

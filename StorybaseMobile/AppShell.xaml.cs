@@ -1,5 +1,6 @@
 ﻿using StorybaseMobile.Pages;
 using StorybaseMobile.Pages.Auth;
+using StorybaseMobile.Views;
 
 namespace StorybaseMobile
 {
@@ -16,6 +17,10 @@ namespace StorybaseMobile
             Routing.RegisterRoute(nameof(RegisterPage), typeof(RegisterPage));
             Routing.RegisterRoute(nameof(ProfilePage), typeof(ProfilePage));
             Routing.RegisterRoute(nameof(ReadingPage), typeof(ReadingPage));
+            Routing.RegisterRoute(nameof(SignUpAsWriterPage), typeof(SignUpAsWriterPage));
+            Routing.RegisterRoute(nameof(SearchPage), typeof(SearchPage));
+
+            Routing.RegisterRoute(nameof(ReadingSettingsView), typeof(ReadingSettingsView));
         }
     }
 }

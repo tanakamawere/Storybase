@@ -18,7 +18,13 @@
                 ContentTemplate="{DataTemplate pages:HomePage}"
                 Route="HomePage" />
         </Tab>
-        <Tab Title="You" Icon="{FontImageSource FontFamily=FASolid, Glyph={x:Static fa:Solid.Person}, Color=Orange}">
+        <Tab Title="Search" Icon="{FontImageSource FontFamily=FASolid, Glyph={x:Static fa:Solid.MagnifyingGlass}}">
+            <ShellContent
+                Title="Search"
+                ContentTemplate="{DataTemplate pages:SearchPage}"
+                Route="SearchPage" />
+        </Tab>
+        <Tab Title="You" Icon="{FontImageSource FontFamily=FASolid, Glyph={x:Static fa:Solid.User}}">
             <ShellContent
                 Title="You"
                 ContentTemplate="{DataTemplate pages:ProfilePage}"

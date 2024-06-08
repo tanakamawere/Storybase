@@ -37,19 +37,6 @@ public partial class BookDetailsViewModel : BaseViewModel
         }
     }
 
-    // Command to go to the writer's page
-    [RelayCommand]
-    public async Task GoToWriter(Writer writer)
-    {
-        if (writer != null)
-        {
-            await Shell.Current.GoToAsync(nameof(WriterViewPage), true, new Dictionary<string, object>
-            {
-                { "writerSelected", writer }
-            });
-        }
-    }
-
     // Command to go to the chapter's page
     [RelayCommand]
     public async Task GoToChapter(Chapter chapter)

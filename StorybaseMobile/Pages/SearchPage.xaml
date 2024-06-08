@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="StorybaseMobile.Pages.SearchPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:fa="clr-namespace:UraniumUI.Icons.FontAwesome;assembly=UraniumUI.Icons.FontAwesome"
+    xmlns:models="clr-namespace:StorybaseLibrary.Models;assembly=StorybaseLibrary"
+    xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+    xmlns:vm="clr-namespace:StorybaseMobile.ViewModels"
+    Title="{Binding Title}"
+    x:DataType="vm:SearchViewModel">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <toolkit:InvertedBoolConverter x:Key="InvertedBoolConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <StackLayout Padding="10">
+
+        <!--  Search Bar  -->
+        <SearchBar
+            x:Name="searchBar"
+            CancelButtonColor="AliceBlue"
+            Placeholder="Search..."
+            SearchCommand="{Binding SearchCommand}"
+            SearchCommandParameter="{Binding Text, Source={x:Reference searchBar}}"
+            Text="{Binding SearchTerm}" />
+
+        <!--  Writers Section  -->
+        <CollectionView
+            HorizontalScrollBarVisibility="Always"
+            IsVisible="{Binding IsBusy, Converter={StaticResource InvertedBoolConverter}}"
+            ItemsLayout="HorizontalList"
+            ItemsSource="{Binding Writers}">
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="models:WriterDto">
+                    <Border
+                        Margin="5"
+                        Padding="5"
+                        Stroke="LightGray">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:SearchViewModel}}, Path=GoToWriterCommand}" CommandParameter="{Binding .}" />
+                        </Border.GestureRecognizers>
+                        <Label Text="{Binding Name}" />
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+            <CollectionView.EmptyView>
+                <Label
+                    Margin="20"
+                    HorizontalOptions="Center"
+                    Text="Look for something"
+                    VerticalOptions="Center" />
+            </CollectionView.EmptyView>
+        </CollectionView>
+
+        <!--  Books Section  -->
+        <CollectionView
+            HorizontalScrollBarVisibility="Always"
+            IsVisible="{Binding IsBusy, Converter={StaticResource InvertedBoolConverter}}"
+            ItemTemplate="{StaticResource BookTemplate}"
+            ItemsLayout="HorizontalList"
+            ItemsSource="{Binding Books}" />
+
+        <ActivityIndicator IsVisible="{Binding IsBusy}" />
+    </StackLayout>
+</ContentPage>

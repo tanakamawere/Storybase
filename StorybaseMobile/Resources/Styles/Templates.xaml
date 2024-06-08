@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<?xaml-comp compile="true" ?>
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:models="clr-namespace:StorybaseLibrary.Models;assembly=StorybaseLibrary"
+    xmlns:vm="clr-namespace:StorybaseMobile.ViewModels">
+
+    <DataTemplate x:Key="BookTemplate" x:DataType="models:Book">
+        <Grid>
+            <Grid.GestureRecognizers>
+                <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:BaseViewModel}}, Path=GoToBookDetailsCommand}" CommandParameter="{Binding .}" />
+            </Grid.GestureRecognizers>
+            <StackLayout>
+
+                <!--  Rounded Image  -->
+                <Border
+                    BackgroundColor="Transparent"
+                    Stroke="Transparent"
+                    StrokeShape="RoundRectangle 10">
+                    <Image
+                        Aspect="AspectFill"
+                        HeightRequest="200"
+                        Source="{Binding CoverImageUrl}" />
+                </Border>
+
+                <Label
+                    Margin="5"
+                    FontAttributes="Bold"
+                    FontSize="Large"
+                    HorizontalOptions="Start"
+                    Text="{Binding Title}"
+                    VerticalOptions="Center" />
+            </StackLayout>
+        </Grid>
+    </DataTemplate>
+
+</ResourceDictionary>
