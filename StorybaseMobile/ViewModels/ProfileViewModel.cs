@@ -18,6 +18,8 @@ public partial class ProfileViewModel : BaseViewModel
     private bool isLoggedIn = false;
     [ObservableProperty]
     private string userRole = "Something here";
+    [ObservableProperty]
+    private bool isWriter = false;
 
     public ProfileViewModel()
     {
@@ -54,6 +56,13 @@ public partial class ProfileViewModel : BaseViewModel
                         else if (claim.Type == "role")
                         {
                             UserRole = claim.Value;
+
+                            IsWriter = UserRole switch
+                            {
+                                "Writer" => true,
+                                "Admin" => true,
+                                _ => false,
+                            };
                         }
                     }
                 }

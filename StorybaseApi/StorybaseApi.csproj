@@ -16,6 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Storybase.ServiceDefaults\Storybase.ServiceDefaults.csproj" />
     <ProjectReference Include="..\StorybaseLibrary\StorybaseLibrary.csproj" />
   </ItemGroup>
 
