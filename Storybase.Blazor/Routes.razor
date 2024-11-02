@@ -1,0 +1,10 @@
+﻿<Router AppAssembly="typeof(Program).Assembly" 
+        AdditionalAssemblies="new[] 
+        { 
+            typeof(Storybase.Components.Pages.Home).Assembly
+        }">
+    <Found Context="routeData">
+        <RouteView RouteData="routeData" DefaultLayout="typeof(Storybase.Blazor.Components.Pages.MainLayout)" />
+        <FocusOnNavigate RouteData="routeData" Selector="h1" />
+    </Found>
+</Router>

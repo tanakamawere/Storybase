@@ -8,13 +8,15 @@
 <MudLayout>
     <MudAppBar>
         <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
-        My Application
+        Storybase
     </MudAppBar>
     <MudDrawer @bind-Open="@_drawerOpen">
-        <NavMenu />
+        <NavMenu/>
     </MudDrawer>
     <MudMainContent>
-        @Body
+        <MudContainer MaxWidth="MaxWidth.Medium">
+            @Body
+        </MudContainer>
     </MudMainContent>
 </MudLayout>
 

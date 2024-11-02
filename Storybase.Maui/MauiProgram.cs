@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using MudBlazor.Services;
 
 namespace Storybase.Maui
 {
@@ -13,6 +14,7 @@ namespace Storybase.Maui
                 {
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                 });
+            builder.Services.AddMudServices();
 
             builder.Services.AddMauiBlazorWebView();
 

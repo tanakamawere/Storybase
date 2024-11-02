@@ -14,6 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Storybase.Blazor\Storybase.Blazor.csproj" />
     <ProjectReference Include="..\Storybase.Blazor\Storybase.Blazor\Storybase.Blazor.csproj" />
     <ProjectReference Include="..\StorybaseApi\StorybaseApi.csproj" />
   </ItemGroup>
