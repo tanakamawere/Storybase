@@ -17,4 +17,8 @@
     <Folder Include="wwwroot\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\StorybaseLibrary\StorybaseLibrary.csproj" />
+  </ItemGroup>
+
 </Project>

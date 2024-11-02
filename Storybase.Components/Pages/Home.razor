@@ -1,5 +1,42 @@
 ﻿@page "/"
 
-<h1>Hello, world!</h1>
+@inject IApiRepository apiRepository
 
-Welcome to your new app.
+<MudGrid Class="mt-8">
+    <MudProgressCircular Color="Color.Default" Indeterminate="true" Class="@(isBusy ? "d-block" : "d-none")"/>
+    <MudItem xs="12" sm="6" md="4" Class="@(isBusy ? "d-none" : "d-block")">
+        @foreach (var book in books)
+        {
+            <MudCard>
+                <MudCardMedia>
+                    <MudImage Src="@book.CoverImageUrl" Alt="@book.Title" />
+                </MudCardMedia>
+                <MudCardContent>
+                    <MudText Typo="Typo.h6">@book.Title</MudText>
+                    <MudText Typo="Typo.body2">@book.Writer.Name</MudText>
+                    <MudText Typo="Typo.body2">@book.Summary</MudText>
+                </MudCardContent>
+            </MudCard>
+        }
+    </MudItem>
+</MudGrid>
+
+@code {
+    //List of books
+    IEnumerable<Book> books { get; set; } = Enumerable.Empty<Book>();
+
+    bool isBusy = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        await LoadBooks();
+    }
+
+    private async Task LoadBooks()
+    {
+        isBusy = true;
+        books = await apiRepository.GetBooksAsync();
+        isBusy = false;
+    }
+}

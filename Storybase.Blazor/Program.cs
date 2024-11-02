@@ -17,7 +17,7 @@ builder.Services.AddRazorComponents()
 builder.Services.AddSingleton<IApiRepository, ApiRepository>();
 builder.Services.AddHttpClient<IApiRepository, ApiRepository>(client =>
 {
-    client.BaseAddress = new Uri(builder.Configuration["StorybaseApi:StorybaseApiEndpoint"]);
+    client.BaseAddress = new Uri(builder.Configuration["StorybaseApiEndpoint"]);
 });
 
 var app = builder.Build();
