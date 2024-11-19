@@ -1,0 +1,27 @@
+/* HomePage.razor.css */
+
+.cards-section {
+    background-color: #f5f5f5; /* Light grey background for the card section */
+    padding: 24px; /* Padding around the grid */
+    border-radius: 12px; /* Rounded corners for the container */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Optional: subtle shadow for depth */
+}
+
+/* App.razor.css or any specific component .razor.css */
+.pill-button {
+    border-radius: 50px;
+    padding: 8px 24px; /* Adjust for desired button size */
+    min-width: 100px; /* Optional: minimum width */
+}
+
+
+/* Optional styling for the MudCard itself if you want each card to stand out more */
+.mud-card {
+    margin: 8px; /* Space between cards */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Light shadow for each card */
+    transition: transform 0.2s ease-in-out; /* Animation for hover effect */
+}
+
+    .mud-card:hover {
+        transform: scale(1.05); /* Slightly enlarge on hover */
+    }

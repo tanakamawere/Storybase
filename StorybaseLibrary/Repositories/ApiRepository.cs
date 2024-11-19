@@ -9,11 +9,11 @@ namespace StorybaseLibrary.Repositories;
 public class ApiRepository : IApiRepository
 {
     private readonly HttpClient httpClient;
-    public ApiRepository(HttpClient HttpClient)
+    public ApiRepository(IHttpClientFactory httpClientFactory)
     {
         try
         {
-            httpClient = HttpClient;
+            httpClient = httpClientFactory.CreateClient("StorybaseApiClient");
         }
         catch (Exception ex)
         {

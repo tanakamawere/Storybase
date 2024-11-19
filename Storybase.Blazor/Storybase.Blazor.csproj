@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net9.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
@@ -10,7 +10,6 @@
     <ProjectReference Include="..\Storybase.Components\Storybase.Components.csproj" />
     <ProjectReference Include="..\Storybase.ServiceDefaults\Storybase.ServiceDefaults.csproj" />
     <ProjectReference Include="..\StorybaseLibrary\StorybaseLibrary.csproj" />
-    <ProjectReference Include="..\Storybase.ServiceDefaults\Storybase.ServiceDefaults.csproj" />
     <PackageReference Include="MudBlazor" Version="7.15.0" />
   </ItemGroup>
 

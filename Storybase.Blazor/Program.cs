@@ -1,6 +1,5 @@
 using MudBlazor.Services;
 using Storybase.Blazor;
-using Storybase.Blazor.Components;
 using StorybaseLibrary.Interfaces;
 using StorybaseLibrary.Repositories;
 
@@ -10,21 +9,27 @@ builder.AddServiceDefaults();
 
 builder.Services.AddMudServices();
 
-// Add services to the container.
-builder.Services.AddRazorComponents()
-    .AddInteractiveServerComponents();
+// Add services to the container.  
+builder.Services.AddRazorComponents().AddInteractiveServerComponents();
 
-builder.Services.AddSingleton<IApiRepository, ApiRepository>();
-builder.Services.AddHttpClient<IApiRepository, ApiRepository>(client =>
+builder.Services.AddHttpClient("StorybaseApiClient", client =>
 {
-    client.BaseAddress = new Uri(builder.Configuration["StorybaseApiEndpoint"]);
+    var baseAddress = builder.Configuration["StorybaseApiEndpoint"];
+    if (string.IsNullOrEmpty(baseAddress))
+    {
+        throw new ArgumentNullException(nameof(baseAddress), "StorybaseApiEndpoint configuration is missing or empty.");
+    }
+    client.BaseAddress = new Uri(baseAddress);
 });
+
+//Repository registrations  
+builder.Services.AddSingleton<IApiRepository, ApiRepository>();
 
 var app = builder.Build();
 
 app.MapDefaultEndpoints();
 
-// Configure the HTTP request pipeline.
+// Configure the HTTP request pipeline.  
 if (app.Environment.IsDevelopment())
 {
     app.UseHsts();
@@ -32,7 +37,7 @@ if (app.Environment.IsDevelopment())
 else
 {
     app.UseExceptionHandler("/Error", createScopeForErrors: true);
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.  
     app.UseHsts();
 }
 
@@ -42,7 +47,7 @@ app.UseStaticFiles();
 app.UseAntiforgery();
 
 app.MapRazorComponents<App>()
-    .AddInteractiveServerRenderMode()
-    .AddAdditionalAssemblies(typeof(Storybase.Components._Imports).Assembly);
+   .AddInteractiveServerRenderMode()
+   .AddAdditionalAssemblies(typeof(Storybase.Components._Imports).Assembly);
 
 app.Run();

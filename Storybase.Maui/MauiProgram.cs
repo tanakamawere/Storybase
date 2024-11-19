@@ -1,5 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using MudBlazor.Services;
+using StorybaseLibrary.Interfaces;
+using StorybaseLibrary.Repositories;
 
 namespace Storybase.Maui
 {
@@ -15,11 +17,16 @@ namespace Storybase.Maui
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                 });
             builder.Services.AddMudServices();
+            builder.Services.AddHttpClient("StorybaseApiClient", client =>
+            client.BaseAddress = new Uri("https://ee6c-154-120-240-26.ngrok-free.app/"));
 
             builder.Services.AddMauiBlazorWebView();
 
+            //Registering services
+            builder.Services.AddSingleton<IApiRepository, ApiRepository>();
+
 #if DEBUG
-    		builder.Services.AddBlazorWebViewDeveloperTools();
+            builder.Services.AddBlazorWebViewDeveloperTools();
     		builder.Logging.AddDebug();
 #endif
 
