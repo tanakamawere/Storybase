@@ -7,10 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Storybase.Components\Storybase.Components.csproj" />
-    <ProjectReference Include="..\Storybase.ServiceDefaults\Storybase.ServiceDefaults.csproj" />
-    <ProjectReference Include="..\StorybaseLibrary\StorybaseLibrary.csproj" />
     <PackageReference Include="MudBlazor" Version="7.15.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Storybase.Components\Storybase.Components.csproj" />
+    <ProjectReference Include="..\StorybaseLibrary\StorybaseLibrary.csproj" />
   </ItemGroup>
 
 </Project>

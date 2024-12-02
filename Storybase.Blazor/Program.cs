@@ -5,10 +5,6 @@ using StorybaseLibrary.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.AddServiceDefaults();
-
-builder.Services.AddMudServices();
-
 // Add services to the container.  
 builder.Services.AddRazorComponents().AddInteractiveServerComponents();
 
@@ -22,12 +18,12 @@ builder.Services.AddHttpClient("StorybaseApiClient", client =>
     client.BaseAddress = new Uri(baseAddress);
 });
 
+builder.Services.AddMudServices();
+
 //Repository registrations  
 builder.Services.AddSingleton<IApiRepository, ApiRepository>();
 
 var app = builder.Build();
-
-app.MapDefaultEndpoints();
 
 // Configure the HTTP request pipeline.  
 if (app.Environment.IsDevelopment())

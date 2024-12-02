@@ -18,7 +18,7 @@ namespace Storybase.Maui
                 });
             builder.Services.AddMudServices();
             builder.Services.AddHttpClient("StorybaseApiClient", client =>
-            client.BaseAddress = new Uri("https://ee6c-154-120-240-26.ngrok-free.app/"));
+            client.BaseAddress = new Uri("https://ndhwhzs1-7199.inc1.devtunnels.ms/"));
 
             builder.Services.AddMauiBlazorWebView();
 
