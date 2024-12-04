@@ -10,6 +10,14 @@ public class EndpointStrings
     public const string SearchPurchases = "api/purchases/search";
     public const string GetAllPurchases = "api/purchases";
 
+    //Reading Progress Endpoints
+    public const string GetReadingProgressById = "api/rdprog/get";
+    public const string CreateReadingProgress = "api/rdprog/create";
+    public const string UpdateReadingProgress = "api/rdprog/update";
+    public const string DeleteReadingProgress = "api/rdprog/delete";
+    public const string SearchReadingProgresss = "api/rdprog/search";
+    public const string GetAllReadingProgresss = "api/rdprog";
+
     //Bookmarks Endpoints
     public const string GetBookmarkById = "api/bookmarks/getbookmark";
     public const string CreateBookmark = "api/bookmarks/create";

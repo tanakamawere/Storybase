@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using MudBlazor.Services;
-using StorybaseLibrary.Interfaces;
-using StorybaseLibrary.Repositories;
+using Storybase.Application.Services;
 
 namespace Storybase.Maui
 {
@@ -23,7 +22,13 @@ namespace Storybase.Maui
             builder.Services.AddMauiBlazorWebView();
 
             //Registering services
-            builder.Services.AddSingleton<IApiRepository, ApiRepository>();
+            builder.Services.AddScoped<BookmarkClient>();
+            builder.Services.AddScoped<ChapterClient>();
+            builder.Services.AddScoped<LiteraryWorkClient>();
+            builder.Services.AddScoped<PurchaseClient>();
+            builder.Services.AddScoped<ReadingProgressClient>();
+            builder.Services.AddScoped<UserClient>();
+            builder.Services.AddScoped<WriterClient>();
 
 #if DEBUG
             builder.Services.AddBlazorWebViewDeveloperTools();

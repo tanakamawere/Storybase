@@ -44,9 +44,9 @@ public static class WriterEndpoints
             return TypedResults.Ok(Writers);
         });
         //Get writers literary works
-        app.MapGet(EndpointStrings.GetWriterLiteraryWorks, async Task<Results<Ok<IEnumerable<LiteraryWork>>, BadRequest>> (IWriterRepository repository, int writerId) =>
+        app.MapGet(EndpointStrings.GetWriterLiteraryWorks, async Task<Results<Ok<IEnumerable<LiteraryWork>>, BadRequest>> (IWriterRepository repository, int id) =>
         {
-            var literaryWorks = await repository.GetLiteraryWorksAsync(writerId);
+            var literaryWorks = await repository.GetLiteraryWorksAsync(id);
             return TypedResults.Ok(literaryWorks);
         });
 

@@ -1,14 +1,14 @@
 using MudBlazor.Services;
+using Storybase.Application.Interfaces;
+using Storybase.Application.Services;
 using Storybase.Blazor;
-using StorybaseLibrary.Interfaces;
-using StorybaseLibrary.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.  
 builder.Services.AddRazorComponents().AddInteractiveServerComponents();
 
-builder.Services.AddHttpClient("StorybaseApiClient", client =>
+builder.Services.AddHttpClient<IApiClient, ApiClient>("StorybaseApiClient", client =>
 {
     var baseAddress = builder.Configuration["StorybaseApiEndpoint"];
     if (string.IsNullOrEmpty(baseAddress))
@@ -21,7 +21,13 @@ builder.Services.AddHttpClient("StorybaseApiClient", client =>
 builder.Services.AddMudServices();
 
 //Repository registrations  
-builder.Services.AddSingleton<IApiRepository, ApiRepository>();
+builder.Services.AddScoped<BookmarkClient>();
+builder.Services.AddScoped<ChapterClient>();
+builder.Services.AddScoped<LiteraryWorkClient>();
+builder.Services.AddScoped<PurchaseClient>();
+builder.Services.AddScoped<ReadingProgressClient>();
+builder.Services.AddScoped<UserClient>();
+builder.Services.AddScoped<WriterClient>();
 
 var app = builder.Build();
 

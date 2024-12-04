@@ -1,5 +1,5 @@
-@page "/bookdetails/{Id:int}"
-@inject IApiRepository apiRepository
+@page "/details/{Id:int}"
+@inject LiteraryWorkClient literaryWorkClient
 
 <MudGrid Spacing="2" style="padding:20px">
     @if (isBusy)
@@ -9,17 +9,17 @@
     else
     {
         <MudItem xs="12" sm="6" Class="align-center justify-center">
-            <img src="@book.CoverImageUrl" alt="@book.Title"
+            <img src="@literaryWork.CoverImageUrl" alt="@literaryWork.Title"
                  class="align-center justify-center"
                 style="max-width:400px; width:100%;object-fit:fill;" />
         </MudItem>
         <MudItem Class="justify-center align-start" xs="12" sm="6">
             <MudStack Spacing="4">
-                <MudText Typo="Typo.h3">@book.Title</MudText>
-                <MudText Typo="Typo.h4">@book.Writer.Name</MudText>
+                <MudText Typo="Typo.h3">@literaryWork.Title</MudText>
+                <MudText Typo="Typo.h4">@literaryWork.Writer.Name</MudText>
 
                 <MudDivider/>
-                <!--Buttons for actions for the book-->
+                <!--Buttons for actions for the literaryWork-->
                 <MudStack Row="true" Spacing="3">
                     <MudIconButton Icon="@Icons.Material.Filled.HeartBroken"
                     Size="Size.Large"
@@ -40,7 +40,7 @@
 
 
                 <MudDivider />
-                <MudText Typo="Typo.body1">@book.Summary</MudText>
+                <MudText Typo="Typo.body1">@literaryWork.Summary</MudText>
             </MudStack>
         </MudItem>
     }
@@ -51,18 +51,18 @@
     [Parameter]
     public int Id { get; set; }
     bool isBusy = false;
-    private Book book = new Book();
+    private LiteraryWork literaryWork = new LiteraryWork();
 
     protected override async Task OnParametersSetAsync()
     {
         await base.OnParametersSetAsync();
-        await LoadBook();
+        await LoadliteraryWork();
     }
 
-    private async Task LoadBook()
+    private async Task LoadliteraryWork()
     {
         isBusy = true;
-        book = await apiRepository.GetBookByIdAsync(Id);
+        literaryWork = await literaryWorkClient.GetLiteraryWorkByIdAsync(Id);
         isBusy = false;
     }
 }

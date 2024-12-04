@@ -15,9 +15,4 @@
     <ProjectReference Include="..\Storybase.Core\Storybase.Core.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Interfaces\" />
-    <Folder Include="Services\" />
-  </ItemGroup>
-
 </Project>
