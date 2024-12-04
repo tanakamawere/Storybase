@@ -23,7 +23,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\StorybaseLibrary\StorybaseLibrary.csproj" />
+    <ProjectReference Include="..\Storybase.Core\Storybase.Core.csproj" />
+    <ProjectReference Include="..\StorybaseLibrary\Storybase.Application.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Migrations\" />
   </ItemGroup>
 
 </Project>

@@ -1,85 +1,46 @@
-﻿namespace StorybaseApi.Endpoints;
+﻿using Storybase.Core;
+using Storybase.Core.Interfaces;
+using Storybase.Core.Models;
+
+namespace StorybaseApi.Endpoints;
 
 public static class ChapterEndpoints
 {
     public static IEndpointRouteBuilder MapChapterEndpoints(this IEndpointRouteBuilder app)
     {
         //Get chapter by id
-        app.MapGet(EndpointStrings.GetChapterById, async Task<Results<Ok<Chapter>, BadRequest>> (AppDbContext context, int id) =>
+        app.MapGet(EndpointStrings.GetChapterById, async Task<Results<Ok<Chapter>, BadRequest>> (IRepository<Chapter> repository, int id) =>
         {
-            var chapter = await context.Chapters.FirstOrDefaultAsync(c => c.Id == id);
-
+            var chapter = await repository.GetByIdAsync(id);
             if (chapter == null)
             {
                 return TypedResults.BadRequest();
             }
-
             return TypedResults.Ok(chapter);
         });
 
         //Create a new chapter
-        app.MapPost(EndpointStrings.CreateChapter, async Task<Results<Ok<string>, BadRequest>> (AppDbContext context, Chapter createChapter) =>
+        app.MapPost(EndpointStrings.CreateChapter, async Task<Results<Ok<string>, BadRequest>> (IRepository<Chapter> repository, Chapter createChapter) =>
         {
-            var chapter = new Chapter
-            {
-                Title = createChapter.Title,
-                Content = createChapter.Content,
-                DatePosted = DateTime.UtcNow,
-                BookId = createChapter.BookId
-            };
-
-            context.Chapters.Add(chapter);
-            await context.SaveChangesAsync();
-
+            await repository.AddAsync(createChapter);
             return TypedResults.Ok("Chapter created successfully");
         });
-
         //Update a chapter
-        app.MapPut(EndpointStrings.UpdateChapter, async Task<Results<Ok<string>, BadRequest>> (AppDbContext context, Chapter updateChapter) =>
+        app.MapPut(EndpointStrings.UpdateChapter, async Task<Results<Ok<string>, BadRequest>> (IRepository<Chapter> repository, Chapter updateChapter) =>
         {
-            var chapter = await context.Chapters.FirstOrDefaultAsync(c => c.Id == updateChapter.Id);
-
-            if (chapter == null)
-            {
-                return TypedResults.BadRequest();
-            }
-
-            chapter.Title = updateChapter.Title;
-            chapter.Content = updateChapter.Content;
-            chapter.DatePosted = DateTime.UtcNow;
-            chapter.BookId = updateChapter.BookId;
-
-            await context.SaveChangesAsync();
-
+            await repository.UpdateAsync(updateChapter);
             return TypedResults.Ok("Chapter updated successfully");
         });
-
-        //Delete a chapter
-        app.MapDelete(EndpointStrings.DeleteChapter, async Task<Results<Ok<string>, BadRequest>> (AppDbContext context, int id) =>
+        //Delete
+        app.MapDelete(EndpointStrings.DeleteChapter, async Task<Results<Ok<string>, BadRequest>> (IRepository<Chapter> repository, int id) =>
         {
-            var chapter = await context.Chapters.FirstOrDefaultAsync(c => c.Id == id);
-
-            if (chapter == null)
-            {
-                return TypedResults.BadRequest();
-            }
-
-            context.Chapters.Remove(chapter);
-            await context.SaveChangesAsync();
-
+            await repository.DeleteAsync(id);
             return TypedResults.Ok("Chapter deleted successfully");
         });
-
-        //Search for chapter
-        app.MapGet(EndpointStrings.SearchChapters, async Task<Results<Ok<List<Chapter>>, BadRequest>> (AppDbContext context, string query) =>
+        //Search
+        app.MapGet(EndpointStrings.SearchChapters, async Task<Results<Ok<IEnumerable<Chapter>>, BadRequest>> (IRepository<Chapter> repository, string query) =>
         {
-            var chapters = await context.Chapters.Where(c => c.Title.Contains(query)).ToListAsync();
-
-            if (chapters == null)
-            {
-                return TypedResults.BadRequest();
-            }
-
+            var chapters = await repository.SearchAsync(query);
             return TypedResults.Ok(chapters);
         });
 

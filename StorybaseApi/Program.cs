@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Http.Json;
+using Storybase.Core.Interfaces;
+using Storybase.Core.Models;
 using StorybaseApi.Endpoints;
-using StorybaseApi.Services;
+using StorybaseApi.Repositories;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,13 +12,18 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddTransient<IPasswordHasher, PasswordHasher>();
-builder.Services.AddTransient<IJwtGenerator, JwtGenerator>();
-
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("StorybaseDbContext"));
 });
+builder.Services.AddScoped<ILiteraryWorkRepository, LiteraryWorkRepository>();
+builder.Services.AddScoped<IGenreRepository, GenreRepository>();
+builder.Services.AddScoped<IRepository<Chapter>, GenericRepository<Chapter>>();
+builder.Services.AddScoped<IRepository<Bookmark>, GenericRepository<Bookmark>>();
+builder.Services.AddScoped<IRepository<User>, GenericRepository<User>>();
+builder.Services.AddScoped<IWriterRepository, WriterRepository>();
+builder.Services.AddScoped<IRepository<ReadingProgress>, GenericRepository<ReadingProgress>>();
+builder.Services.AddScoped<IRepository<Purchase>, GenericRepository<Purchase>>();
 
 builder.Services.Configure<JsonOptions>(options => {
     options.SerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
@@ -34,10 +41,10 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.MapAuthEndpoints();
 app.MapChapterEndpoints();
+app.MapLiteraryWorkEndpoints();
+app.MapPurchaseEndpoints();
+app.MapUserEndpoints();
 app.MapWriterEndpoints();
-app.MapBookEndpoints();
-app.MapGeneralEndpoints();
 
 app.Run();

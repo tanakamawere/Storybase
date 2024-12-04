@@ -59,7 +59,8 @@
     <ItemGroup>
       <ProjectReference Include="..\..\Maui.Apps.Framework\Maui.Apps.Framework.csproj" />
 		<ProjectReference Include="..\Storybase.Components\Storybase.Components.csproj" />
-		<ProjectReference Include="..\StorybaseLibrary\StorybaseLibrary.csproj" />
+		<ProjectReference Include="..\Storybase.Core\Storybase.Core.csproj" />
+		<ProjectReference Include="..\StorybaseLibrary\Storybase.Application.csproj" />
     </ItemGroup>
 
 </Project>

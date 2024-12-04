@@ -1,17 +1,19 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 
-namespace StorybaseLibrary.Models;
+namespace Storybase.Core.Models;
 
 public class Chapter
 {
     public int Id { get; set; }
     public int BookId { get; set; }
+    public LiteraryWork LiteraryWork { get; set; }
+
     public DateTime DatePosted { get; set; } = DateTime.UtcNow;
     public int ChapterNumber { get; set; }
     public string Title { get; set; }
     public string Content { get; set; }
-    //This is price and should be correct to 2dp
+
+    // Pricing
     [Column(TypeName = "decimal(18, 2)")]
-    public decimal Price { get; set; }
-    public Book Book { get; set; }
+    public decimal? ChapterPrice { get; set; }
 }

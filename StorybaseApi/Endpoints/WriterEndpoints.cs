@@ -1,65 +1,55 @@
-﻿namespace StorybaseApi.Endpoints
+﻿using Storybase.Core;
+using Storybase.Core.Interfaces;
+using Storybase.Core.Models;
+
+namespace StorybaseApi.Endpoints;
+
+public static class WriterEndpoints
 {
-    public static class WriterEndpoints
+    public static IEndpointRouteBuilder MapWriterEndpoints(this IEndpointRouteBuilder app)
     {
-        public static IEndpointRouteBuilder MapWriterEndpoints(this IEndpointRouteBuilder app)
+        //Get Writer by id
+        app.MapGet(EndpointStrings.GetWriterById, async Task<Results<Ok<Writer>, BadRequest>> (IWriterRepository repository, int id) =>
         {
-            //Search for writers
-            app.MapGet(EndpointStrings.SearchWriters, async Task<Results<Ok<List<Writer>>, BadRequest>> (AppDbContext context, string query) =>
+            var Writer = await repository.GetByIdAsync(id);
+            if (Writer == null)
             {
-                var writers = await context.Writers.Where(w => w.Name.Contains(query))
-                .Where(w => w.UserName.Contains(query))
-                .Where(w => w.Bio.Contains(query))
-                .ToListAsync();
+                return TypedResults.BadRequest();
+            }
+            return TypedResults.Ok(Writer);
+        });
 
-                return TypedResults.Ok(writers);
-            });
+        //Create a new Writer
+        app.MapPost(EndpointStrings.CreateWriter, async Task<Results<Ok<string>, BadRequest>> (IWriterRepository repository, Writer createWriter) =>
+        {
+            await repository.AddAsync(createWriter);
+            return TypedResults.Ok("Writer created successfully");
+        });
+        //Update a Writer
+        app.MapPut(EndpointStrings.UpdateWriter, async Task<Results<Ok<string>, BadRequest>> (IWriterRepository repository, Writer updateWriter) =>
+        {
+            await repository.UpdateAsync(updateWriter);
+            return TypedResults.Ok("Writer updated successfully");
+        });
+        //Delete
+        app.MapDelete(EndpointStrings.DeleteWriter, async Task<Results<Ok<string>, BadRequest>> (IWriterRepository repository, int id) =>
+        {
+            await repository.DeleteAsync(id);
+            return TypedResults.Ok("Writer deleted successfully");
+        });
+        //Search
+        app.MapGet(EndpointStrings.SearchWriters, async Task<Results<Ok<IEnumerable<Writer>>, BadRequest>> (IWriterRepository repository, string query) =>
+        {
+            var Writers = await repository.SearchAsync(query);
+            return TypedResults.Ok(Writers);
+        });
+        //Get writers literary works
+        app.MapGet(EndpointStrings.GetWriterLiteraryWorks, async Task<Results<Ok<IEnumerable<LiteraryWork>>, BadRequest>> (IWriterRepository repository, int writerId) =>
+        {
+            var literaryWorks = await repository.GetLiteraryWorksAsync(writerId);
+            return TypedResults.Ok(literaryWorks);
+        });
 
-            //Get all books by a writer
-            app.MapGet(EndpointStrings.GetWriterBooks, async Task<Results<Ok<List<Book>>, BadRequest>> (AppDbContext context, int writerId) =>
-            {
-                var books = await context.Books.Where(b => b.Writer.Id == writerId).ToListAsync();
-
-                return TypedResults.Ok(books);
-            });
-
-            //Get all chapters by a writer
-            app.MapGet(EndpointStrings.GetWriterChapters, async Task<Results<Ok<List<Chapter>>, BadRequest>> (AppDbContext context, int writerId) =>
-            {
-                var chapters = await context.Chapters.Where(c => c.Book.Writer.Id == writerId).ToListAsync();
-
-                return TypedResults.Ok(chapters);
-            });
-
-            //Create a writer
-            app.MapPost(EndpointStrings.CreateWriterSignup, async Task<Results<Ok<string>, BadRequest>> (AppDbContext context, WriterDto writerDto) =>
-            {
-                //Map the writer dto to a writer object
-                var writer = new Writer
-                {
-                    Name = writerDto.Name,
-                    UserName = writerDto.UserName,
-                    Bio = writerDto.Bio,
-                    ContactInfo = writerDto.ContactInfo
-                };
-
-                context.Writers.Add(writer);
-                await context.SaveChangesAsync();
-
-                return TypedResults.Ok("Writer created successfully");
-            });
-
-            //Get the writer profile
-            app.MapGet(EndpointStrings.GetWriterProfile, async Task<Results<Ok<Writer>, BadRequest>> (AppDbContext context, int writerId) =>
-            {
-                var writer = await context.Writers
-                .Include(x => x.Books)
-                .FirstOrDefaultAsync(w => w.Id == writerId);
-
-                return TypedResults.Ok(writer);
-            });
-
-            return app;
-        }
+        return app;
     }
 }
