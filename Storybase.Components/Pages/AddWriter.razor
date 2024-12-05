@@ -1,0 +1,82 @@
+﻿@page "/addwriter"
+@using Storybase.Application.Services
+@using Storybase.Core.DTOs
+@using Storybase.Core.Models
+@inject NavigationManager navManager
+@inject WriterClient writerClient
+@inject ISnackbar Snackbar
+
+<MudContainer MaxWidth="MaxWidth.ExtraExtraLarge" Class="d-flex align-center">
+
+    <h3>Sign Up to Become a Writer</h3>
+
+    <MudPaper Class="@(isWriter ? "invisible pa-4" : "visible pa-4")" Elevation="4">
+        <EditForm OnValidSubmit="OnValidSubmit" Model="writer">
+            <MudTextField @bind-Value="writer.UserName" Label="Username" Required="true" />
+            <MudTextField @bind-Value="writer.ContactInfo"
+                            Label="Email Address"
+                            InputType="InputType.Email"
+                            Required="true" />
+            <MudTextField @bind-Value="writer.Bio"
+                        Lines="3"
+                        Label="Bio"
+                        Placeholder="Write an eye catching profile bio for potential readers"
+                        InputType="InputType.Password" Required="true" />
+            <MudButton ButtonType="ButtonType.Submit" 
+            Variant="Variant.Filled" 
+            Color="Color.Primary">
+                Sign Up
+            </MudButton>
+        </EditForm>
+    </MudPaper>
+
+    <MudPaper Class="@(isWriter ? "visible pa-4" : "invisible pa-4")">
+        <MudText Typo="Typo.h6">You are already a writer.</MudText>
+    </MudPaper>
+
+</MudContainer>
+
+
+@code {
+
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationState { get; set; }
+    private WriterDto writer = new();
+    private Snackbar snackbar;
+    private string? writerName = "";
+    private bool isBusy = false;
+    private bool isWriter = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        //Get current logged in user details
+        if (authenticationState is not null)
+        {
+            var state = await authenticationState;
+            //Get user id
+            var userId = state.User.Claims.FirstOrDefault(c => c.Type == "sub")?.Value;
+            writerName = state.User.Claims.FirstOrDefault(c => c.Type == "name")?.Value;
+
+            //Check if user already has a writer account
+            //Returns true if user is already a writer
+            isWriter = await writerClient.HasWriterProfileAsync(userId);
+        }
+    }
+
+    private async void OnValidSubmit()
+    {
+        //Check if the user name is not already taken
+        if (await writerClient.IsUserNameTakenAsync(writer.UserName))
+        {
+            Snackbar.Add("Username already taken", Severity.Error);
+            return;
+        }
+
+        //Add new writer
+        await writerClient.AddWriterAsync(writer);
+        //Show success message
+        Snackbar.Add("Writer account created successfully", Severity.Success);
+        //Redirect to home page
+        navManager.NavigateTo("/");
+    }
+}

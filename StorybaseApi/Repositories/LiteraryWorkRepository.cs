@@ -58,7 +58,7 @@ public class LiteraryWorkRepository : ILiteraryWorkRepository
         //Return all literary works that contain the query in their title, writer, genre or chapter
         return await _context.LiteraryWorks
                              .Where(lw => lw.Title.Contains(query) ||
-                                          lw.Writer.Name.Contains(query) ||
+                                          lw.Writer.User.Name.Contains(query) ||
                                           lw.Genres.Any(g => g.Name.Contains(query)) ||
                                           lw.Chapters.Any(c => c.Title.Contains(query) || c.Content.Contains(query)))
                              .ToListAsync();

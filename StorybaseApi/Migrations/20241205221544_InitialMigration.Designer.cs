@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using StorybaseApi.Data;
 
@@ -11,9 +12,11 @@ using StorybaseApi.Data;
 namespace StorybaseApi.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241205221544_InitialMigration")]
+    partial class InitialMigration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -56,11 +59,9 @@ namespace StorybaseApi.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("LiteraryWorkId")
-                        .HasDatabaseName("IX_Bookmark_LiteraryWorkId");
+                    b.HasIndex("LiteraryWorkId");
 
-                    b.HasIndex("UserId")
-                        .HasDatabaseName("IX_Bookmark_UserId");
+                    b.HasIndex("UserId");
 
                     b.ToTable("Bookmarks");
                 });
@@ -94,9 +95,6 @@ namespace StorybaseApi.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("BookId")
-                        .HasDatabaseName("IX_Chapter_BookId");
 
                     b.HasIndex("BookId", "ChapterNumber")
                         .IsUnique()
@@ -171,8 +169,7 @@ namespace StorybaseApi.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("WriterId")
-                        .HasDatabaseName("IX_LiteraryWork_WriterId");
+                    b.HasIndex("WriterId");
 
                     b.ToTable("LiteraryWorks");
                 });
@@ -238,14 +235,11 @@ namespace StorybaseApi.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ChapterId")
-                        .HasDatabaseName("IX_Purchase_ChapterId");
+                    b.HasIndex("ChapterId");
 
-                    b.HasIndex("LiteraryWorkId")
-                        .HasDatabaseName("IX_Purchase_LiteraryWorkId");
+                    b.HasIndex("LiteraryWorkId");
 
-                    b.HasIndex("UserId")
-                        .HasDatabaseName("IX_Purchase_UserId");
+                    b.HasIndex("UserId");
 
                     b.ToTable("Purchases");
                 });
@@ -275,11 +269,9 @@ namespace StorybaseApi.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("LiteraryWorkId")
-                        .HasDatabaseName("IX_ReadingProgress_LiteraryWorkId");
+                    b.HasIndex("LiteraryWorkId");
 
-                    b.HasIndex("UserId")
-                        .HasDatabaseName("IX_ReadingProgress_UserId");
+                    b.HasIndex("UserId");
 
                     b.ToTable("ReadingProgress");
                 });
@@ -294,7 +286,7 @@ namespace StorybaseApi.Migrations
 
                     b.Property<string>("Auth0UserId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -305,10 +297,6 @@ namespace StorybaseApi.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("Auth0UserId")
-                        .IsUnique()
-                        .HasDatabaseName("IX_User_Auth0UserId");
 
                     b.ToTable("Users");
                 });

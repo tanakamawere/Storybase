@@ -47,6 +47,10 @@ public class EndpointStrings
     public const string DeleteWriter = "api/writers/delete";
     public const string SearchWriters = "api/writers/search";
     public const string GetWriterLiteraryWorks = "api/writers/literaryworks";
+    //Check if username is taken
+    public const string IsUserNameTaken = "api/writers/username";
+    //Check if the user already has a writer profile
+    public const string HasWriterProfile = "api/writers/hasprofile";
 
     //Literary Work Endpoints
     public const string GetAllLiteraryWorks = "api/literaryworks";

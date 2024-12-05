@@ -1,14 +1,13 @@
-﻿namespace Storybase.Core.Models;
+﻿using Storybase.Core.Models;
 
-public class Writer
+namespace Storybase.Core.DTOs;
+
+public class WriterDto
 {
     public int Id { get; set; }
     public int UserId { get; set; }
-    public User User { get; set; }
+    public string Auth0UserId { get; set; }
     public string? UserName { get; set; }
     public string? Bio { get; set; }
     public string? ContactInfo { get; set; }
-
-    public ICollection<LiteraryWork> LiteraryWorks { get; set; } = new List<LiteraryWork>();
 }
-

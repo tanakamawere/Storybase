@@ -12,8 +12,8 @@ using StorybaseApi.Data;
 namespace StorybaseApi.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20241204115025_DatabaseUpsideDown")]
-    partial class DatabaseUpsideDown
+    [Migration("20241205223554_IndexingToDb")]
+    partial class IndexingToDb
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -37,7 +37,7 @@ namespace StorybaseApi.Migrations
 
                     b.HasIndex("LiteraryWorksId");
 
-                    b.ToTable("GenreLiteraryWork");
+                    b.ToTable("LiteraryWorkGenres", (string)null);
                 });
 
             modelBuilder.Entity("Storybase.Core.Models.Bookmark", b =>
@@ -59,9 +59,11 @@ namespace StorybaseApi.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("LiteraryWorkId");
+                    b.HasIndex("LiteraryWorkId")
+                        .HasDatabaseName("IX_Bookmark_LiteraryWorkId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("UserId")
+                        .HasDatabaseName("IX_Bookmark_UserId");
 
                     b.ToTable("Bookmarks");
                 });
@@ -80,9 +82,6 @@ namespace StorybaseApi.Migrations
                     b.Property<int>("ChapterNumber")
                         .HasColumnType("int");
 
-                    b.Property<decimal?>("ChapterPrice")
-                        .HasColumnType("decimal(18, 2)");
-
                     b.Property<string>("Content")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -90,8 +89,8 @@ namespace StorybaseApi.Migrations
                     b.Property<DateTime>("DatePosted")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("LiteraryWorkId")
-                        .HasColumnType("int");
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -99,7 +98,12 @@ namespace StorybaseApi.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("LiteraryWorkId");
+                    b.HasIndex("BookId")
+                        .HasDatabaseName("IX_Chapter_BookId");
+
+                    b.HasIndex("BookId", "ChapterNumber")
+                        .IsUnique()
+                        .HasDatabaseName("IX_Chapter_BookId_ChapterNumber");
 
                     b.ToTable("Chapters");
                 });
@@ -136,17 +140,20 @@ namespace StorybaseApi.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<double?>("FreePreviewPercentage")
-                        .HasColumnType("float");
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
 
-                    b.Property<decimal?>("FullBookPrice")
+                    b.Property<decimal?>("FreePreviewPercentage")
                         .HasColumnType("decimal(18, 2)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
 
                     b.Property<bool>("IsFree")
                         .HasColumnType("bit");
 
-                    b.Property<decimal?>("Price")
-                        .HasColumnType("decimal(18, 2)");
+                    b.Property<DateTime?>("LastModified")
+                        .HasColumnType("datetime2");
 
                     b.Property<bool>("ProgressiveWriting")
                         .HasColumnType("bit");
@@ -167,9 +174,46 @@ namespace StorybaseApi.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("WriterId");
+                    b.HasIndex("WriterId")
+                        .HasDatabaseName("IX_LiteraryWork_WriterId");
 
                     b.ToTable("LiteraryWorks");
+                });
+
+            modelBuilder.Entity("Storybase.Core.Models.Pricing", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("decimal(18, 2)");
+
+                    b.Property<int?>("ChapterId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("EffectiveDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("LiteraryWorkId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PricingType")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ChapterId");
+
+                    b.HasIndex("PricingType")
+                        .HasDatabaseName("IX_Pricing_PricingType");
+
+                    b.HasIndex("LiteraryWorkId", "PricingType")
+                        .HasDatabaseName("IX_Pricing_LiteraryWorkId_PricingType");
+
+                    b.ToTable("Pricing");
                 });
 
             modelBuilder.Entity("Storybase.Core.Models.Purchase", b =>
@@ -197,11 +241,14 @@ namespace StorybaseApi.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ChapterId");
+                    b.HasIndex("ChapterId")
+                        .HasDatabaseName("IX_Purchase_ChapterId");
 
-                    b.HasIndex("LiteraryWorkId");
+                    b.HasIndex("LiteraryWorkId")
+                        .HasDatabaseName("IX_Purchase_LiteraryWorkId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("UserId")
+                        .HasDatabaseName("IX_Purchase_UserId");
 
                     b.ToTable("Purchases");
                 });
@@ -231,9 +278,11 @@ namespace StorybaseApi.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("LiteraryWorkId");
+                    b.HasIndex("LiteraryWorkId")
+                        .HasDatabaseName("IX_ReadingProgress_LiteraryWorkId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("UserId")
+                        .HasDatabaseName("IX_ReadingProgress_UserId");
 
                     b.ToTable("ReadingProgress");
                 });
@@ -248,7 +297,7 @@ namespace StorybaseApi.Migrations
 
                     b.Property<string>("Auth0UserId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -259,6 +308,10 @@ namespace StorybaseApi.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Auth0UserId")
+                        .IsUnique()
+                        .HasDatabaseName("IX_User_Auth0UserId");
 
                     b.ToTable("Users");
                 });
@@ -272,22 +325,20 @@ namespace StorybaseApi.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Bio")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ContactInfo")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
 
                     b.Property<string>("UserName")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Writers");
                 });
@@ -330,7 +381,7 @@ namespace StorybaseApi.Migrations
                 {
                     b.HasOne("Storybase.Core.Models.LiteraryWork", "LiteraryWork")
                         .WithMany("Chapters")
-                        .HasForeignKey("LiteraryWorkId")
+                        .HasForeignKey("BookId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -348,6 +399,21 @@ namespace StorybaseApi.Migrations
                     b.Navigation("Writer");
                 });
 
+            modelBuilder.Entity("Storybase.Core.Models.Pricing", b =>
+                {
+                    b.HasOne("Storybase.Core.Models.Chapter", "Chapter")
+                        .WithMany()
+                        .HasForeignKey("ChapterId");
+
+                    b.HasOne("Storybase.Core.Models.LiteraryWork", "LiteraryWork")
+                        .WithMany()
+                        .HasForeignKey("LiteraryWorkId");
+
+                    b.Navigation("Chapter");
+
+                    b.Navigation("LiteraryWork");
+                });
+
             modelBuilder.Entity("Storybase.Core.Models.Purchase", b =>
                 {
                     b.HasOne("Storybase.Core.Models.Chapter", "Chapter")
@@ -361,7 +427,7 @@ namespace StorybaseApi.Migrations
                     b.HasOne("Storybase.Core.Models.User", "User")
                         .WithMany("Purchases")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Chapter");
@@ -386,6 +452,17 @@ namespace StorybaseApi.Migrations
                         .IsRequired();
 
                     b.Navigation("LiteraryWork");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Storybase.Core.Models.Writer", b =>
+                {
+                    b.HasOne("Storybase.Core.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
 
                     b.Navigation("User");
                 });

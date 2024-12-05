@@ -20,7 +20,7 @@ builder.Services.AddScoped<ILiteraryWorkRepository, LiteraryWorkRepository>();
 builder.Services.AddScoped<IGenreRepository, GenreRepository>();
 builder.Services.AddScoped<IRepository<Chapter>, GenericRepository<Chapter>>();
 builder.Services.AddScoped<IRepository<Bookmark>, GenericRepository<Bookmark>>();
-builder.Services.AddScoped<IRepository<User>, GenericRepository<User>>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IWriterRepository, WriterRepository>();
 builder.Services.AddScoped<IRepository<ReadingProgress>, GenericRepository<ReadingProgress>>();
 builder.Services.AddScoped<IRepository<Purchase>, GenericRepository<Purchase>>();

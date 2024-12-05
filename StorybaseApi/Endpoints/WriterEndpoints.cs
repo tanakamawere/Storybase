@@ -1,6 +1,8 @@
 ﻿using Storybase.Core;
+using Storybase.Core.DTOs;
 using Storybase.Core.Interfaces;
 using Storybase.Core.Models;
+using StorybaseApi.Repositories;
 
 namespace StorybaseApi.Endpoints;
 
@@ -20,15 +22,41 @@ public static class WriterEndpoints
         });
 
         //Create a new Writer
-        app.MapPost(EndpointStrings.CreateWriter, async Task<Results<Ok<string>, BadRequest>> (IWriterRepository repository, Writer createWriter) =>
+        app.MapPost(EndpointStrings.CreateWriter, async Task<Results<Ok<string>, BadRequest>> (IWriterRepository repository, IUserRepository userRepository, WriterDto createWriter) =>
         {
-            await repository.AddAsync(createWriter);
+            //Get user object from db from Auth0UserId
+            User user = await userRepository.GetByAuth0UserIdAsync(createWriter.Auth0UserId);
+
+            Writer writer = new()
+            {
+                UserId = createWriter.UserId,
+                UserName = createWriter.UserName,
+                User = user,
+                Bio = createWriter.Bio,
+                ContactInfo = createWriter.ContactInfo
+            };
+
+            await repository.AddAsync(writer);
             return TypedResults.Ok("Writer created successfully");
         });
         //Update a Writer
-        app.MapPut(EndpointStrings.UpdateWriter, async Task<Results<Ok<string>, BadRequest>> (IWriterRepository repository, Writer updateWriter) =>
+        app.MapPut(EndpointStrings.UpdateWriter, async Task<Results<Ok<string>, BadRequest>> (IWriterRepository repository, IUserRepository userRepository, WriterDto updateWriter) =>
         {
-            await repository.UpdateAsync(updateWriter);
+            //Get user object from db from Auth0UserId
+            User user = await userRepository.GetByAuth0UserIdAsync(updateWriter.Auth0UserId);
+
+            //Update the writer object
+            Writer writer = new()
+            {
+                Id = updateWriter.Id,
+                UserId = updateWriter.UserId,
+                UserName = updateWriter.UserName,
+                User = user,
+                Bio = updateWriter.Bio,
+                ContactInfo = updateWriter.ContactInfo
+            };
+
+            await repository.UpdateAsync(writer);
             return TypedResults.Ok("Writer updated successfully");
         });
         //Delete
@@ -48,6 +76,18 @@ public static class WriterEndpoints
         {
             var literaryWorks = await repository.GetLiteraryWorksAsync(id);
             return TypedResults.Ok(literaryWorks);
+        });
+        //Check if username is taken
+        app.MapGet(EndpointStrings.IsUserNameTaken, async Task<Results<Ok<bool>, BadRequest>> (IWriterRepository repository, string userName) =>
+        {
+            var isTaken = await repository.IsUserNameTakenAsync(userName);
+            return TypedResults.Ok(isTaken);
+        });
+        //Check if the user already has a writer profile
+        app.MapGet(EndpointStrings.HasWriterProfile, async Task<Results<Ok<bool>, BadRequest>> (IWriterRepository repository, string userId) =>
+        {
+            var hasProfile = await repository.HasWriterProfileAsync(userId);
+            return TypedResults.Ok(hasProfile);
         });
 
         return app;

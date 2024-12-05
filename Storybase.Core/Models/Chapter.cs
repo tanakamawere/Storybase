@@ -9,11 +9,10 @@ public class Chapter
     public LiteraryWork LiteraryWork { get; set; }
 
     public DateTime DatePosted { get; set; } = DateTime.UtcNow;
+    //Chapter number should be unique   
     public int ChapterNumber { get; set; }
     public string Title { get; set; }
     public string Content { get; set; }
-
-    // Pricing
-    [Column(TypeName = "decimal(18, 2)")]
-    public decimal? ChapterPrice { get; set; }
+    //Soft delete
+    public bool IsDeleted { get; set; } = false;
 }
