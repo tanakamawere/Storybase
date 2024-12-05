@@ -44,6 +44,7 @@
     private WriterDto writer = new();
     private Snackbar snackbar;
     private string? writerName = "";
+    private string Auth0UserId = "";
     private bool isBusy = false;
     private bool isWriter = false;
 
@@ -54,12 +55,12 @@
         {
             var state = await authenticationState;
             //Get user id
-            var userId = state.User.Claims.FirstOrDefault(c => c.Type == "sub")?.Value;
+            Auth0UserId = state.User.Claims.FirstOrDefault(c => c.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")?.Value;
             writerName = state.User.Claims.FirstOrDefault(c => c.Type == "name")?.Value;
 
             //Check if user already has a writer account
             //Returns true if user is already a writer
-            isWriter = await writerClient.HasWriterProfileAsync(userId);
+            isWriter = await writerClient.HasWriterProfileAsync(Auth0UserId);
         }
     }
 
@@ -71,6 +72,9 @@
             Snackbar.Add("Username already taken", Severity.Error);
             return;
         }
+
+        //Add AuthUserId to the writer object
+        writer.Auth0UserId = Auth0UserId;
 
         //Add new writer
         await writerClient.AddWriterAsync(writer);
