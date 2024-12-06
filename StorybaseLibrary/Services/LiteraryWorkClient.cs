@@ -24,9 +24,9 @@ public class LiteraryWorkClient
     }
 
     //Delete LiteraryWork
-    public async Task<LiteraryWork> DeleteLiteraryWorkAsync(int id)
+    public async Task<string> DeleteLiteraryWorkAsync(int id)
     {
-        return await _apiClient.DeleteAsync<LiteraryWork>($"{EndpointStrings.DeleteLiteraryWork}?id={id}");
+        return await _apiClient.GetAsync<string>($"{EndpointStrings.DeleteLiteraryWork}?id={id}");
     }
     //update LiteraryWork
     public async Task<LiteraryWork> UpdateLiteraryWorkAsync(LiteraryWork LiteraryWork)
@@ -42,5 +42,10 @@ public class LiteraryWorkClient
     public async Task<IEnumerable<LiteraryWork>> GetLiteraryWorksAsync()
     {
         return await _apiClient.GetAsync<IEnumerable<LiteraryWork>>(EndpointStrings.GetAllLiteraryWorks);
+    }
+    //Unarchive/undelete lw
+    public async Task<string> UnarchiveLiteraryWork(int id)
+    {
+        return await _apiClient.GetAsync<string>($"{EndpointStrings.UnarchiveLiteraryWork}?id={id}");
     }
 }

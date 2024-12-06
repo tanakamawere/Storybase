@@ -1,0 +1,8 @@
+﻿@page "/writing/add"
+@page "/writing/edit/{id}"
+@attribute [Authorize]
+
+@code {
+    [Parameter]
+    public int id { get; set; } = 0;
+}

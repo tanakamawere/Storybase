@@ -1,4 +1,7 @@
-﻿<MudNavMenu>
+﻿@using Storybase.Application.Services
+@inject WriterClient writerClient
+
+<MudNavMenu>
     <CascadingAuthenticationState>
         ﻿<AuthorizeView>
             <Authorized>
@@ -26,12 +29,30 @@
     <MudNavLink Icon="@Icons.Material.Filled.Help" Href="/help">
         Help
     </MudNavLink>
+
+    <MudDivider />
+    <div>
+        @if (isWriter)
+        {
+            <MudNavLink Icon="@Icons.Material.Filled.Create" Href="/writing/dashboard">
+                Writing Dashboard
+            </MudNavLink>
+        }
+        else
+        {
+            <MudNavLink Icon="@Icons.Material.Filled.Create" Href="/writing/addwriter">
+                Become a Writer
+            </MudNavLink>
+        }
+    </div>
 </MudNavMenu>
 
 @code {
     private string UserName = "";
-        [CascadingParameter]
-        private Task<AuthenticationState> authenticationState { get; set; }
+    string auth0UserId = "";
+    bool isWriter = false;
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationState { get; set; }
 
 
     protected override async Task OnInitializedAsync()
@@ -40,6 +61,15 @@
         {
             var state = await authenticationState;
             UserName = state?.User?.Identity?.Name ?? string.Empty;
+
+            //Get user id
+            auth0UserId = state.
+                        User.
+                        Claims.
+                        FirstOrDefault(c => c.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")?.
+                        Value ?? "";
+            //Check if user is a writer
+            isWriter = await writerClient.HasWriterProfileAsync(auth0UserId);
         }
     }
 }

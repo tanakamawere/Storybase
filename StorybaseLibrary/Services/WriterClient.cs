@@ -54,4 +54,8 @@ public class WriterClient
     {
         return await _apiClient.GetAsync<bool>($"{EndpointStrings.HasWriterProfile}?userId={userId}");
     }
+    public async Task<IEnumerable<LiteraryWork>> GetLiteraryWorksByAuthIdAsync(string auth0id)
+    {
+        return await _apiClient.GetAsync<IEnumerable<LiteraryWork>>($"{EndpointStrings.GetWriterLiteraryByAuthId}?auth0id={auth0id}");
+    }
 }

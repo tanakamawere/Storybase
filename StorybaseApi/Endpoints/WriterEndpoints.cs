@@ -89,6 +89,12 @@ public static class WriterEndpoints
             var hasProfile = await repository.HasWriterProfileAsync(userId);
             return TypedResults.Ok(hasProfile);
         });
+        //Get literary works by auth id
+        app.MapGet(EndpointStrings.GetWriterLiteraryByAuthId, async Task<Results<Ok<IEnumerable<LiteraryWork>>, BadRequest>> (IWriterRepository repository, string auth0id) =>
+        {
+            var literaryWorks = await repository.GetLiteraryWorksByAuthIdAsync(auth0id);
+            return TypedResults.Ok(literaryWorks);
+        });
 
         return app;
     }

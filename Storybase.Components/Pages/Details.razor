@@ -1,5 +1,6 @@
 @page "/details/{Id:int}"
 @inject LiteraryWorkClient literaryWorkClient
+@attribute [Authorize]
 
 <MudGrid Spacing="2" style="padding:20px">
     @if (isBusy)
@@ -10,8 +11,8 @@
     {
         <MudItem xs="12" sm="6" Class="align-center justify-center">
             <img src="@literaryWork.CoverImageUrl" alt="@literaryWork.Title"
-                 class="align-center justify-center"
-                style="max-width:400px; width:100%;object-fit:fill;" />
+            class="align-center justify-center"
+            style="max-width:400px; width:100%;object-fit:fill;" />
         </MudItem>
         <MudItem Class="justify-center align-start" xs="12" sm="6">
             <MudStack Spacing="4">
@@ -21,26 +22,39 @@
                 <MudDivider/>
                 <!--Buttons for actions for the literaryWork-->
                 <MudStack Row="true" Spacing="3">
-                    <MudIconButton Icon="@Icons.Material.Filled.HeartBroken"
-                    Size="Size.Large"
-                                   Ripple="true"
-                                   Variant="Variant.Text"
-                                   Color="Color.Secondary" />
-                    <MudIconButton Icon="@Icons.Material.Filled.AddTask"
-                                   Size="Size.Large"
-                                    Ripple="true" 
-                                    Variant="Variant.Text"
-                                   Color="Color.Secondary" />
+                    <MudIconButton Icon="@Icons.Material.Filled.BookmarkAdd"
+                                Size="Size.Large"
+                                Ripple="true"
+                                Variant="Variant.Text"
+                                Color="Color.Secondary" />
                     <MudIconButton Icon="@Icons.Material.Filled.Share"
-                                   Size="Size.Large"
-                                   Ripple="true"
-                                   Variant="Variant.Text"
-                                   Color="Color.Secondary" />
+                        Size="Size.Large"
+                        Ripple="true"
+                        Variant="Variant.Text"
+                        Color="Color.Secondary" />
                 </MudStack>
-
 
                 <MudDivider />
                 <MudText Typo="Typo.body1">@literaryWork.Summary</MudText>
+                <MudDivider />
+
+                <!--If there are chapters-->
+                @if (literaryWork.Type.Equals(LiteraryWorkType.Book) && literaryWork.Chapters.Count > 0)
+                {
+                    //List of chapters
+                    foreach (var item in literaryWork.Chapters)
+                    {
+                        <MudPaper Elevation="2" Class="ma-3">
+                            <MudStack AlignItems="AlignItems.Stretch">
+                                <MudText Typo="Typo.h3">@item.ChapterNumber</MudText>
+                                <div>
+                                    <MudText Typo="Typo.h6">@item.Title</MudText>
+                                    <MudText Typo="Typo.body2">Uploaded on: @item.DatePosted</MudText>
+                                </div>
+                            </MudStack>
+                        </MudPaper>
+                    }
+                }
             </MudStack>
         </MudItem>
     }
@@ -51,6 +65,8 @@
     [Parameter]
     public int Id { get; set; }
     bool isBusy = false;
+    //If this is set to true, it means the lit work is by the current user. Show options to edit & manipulate
+    bool isWritersWork = false;
     private LiteraryWork literaryWork = new LiteraryWork();
 
     protected override async Task OnParametersSetAsync()

@@ -47,9 +47,8 @@ public class EndpointStrings
     public const string DeleteWriter = "api/writers/delete";
     public const string SearchWriters = "api/writers/search";
     public const string GetWriterLiteraryWorks = "api/writers/literaryworks";
-    //Check if username is taken
+    public const string GetWriterLiteraryByAuthId = "api/writers/lwbyauthid";
     public const string IsUserNameTaken = "api/writers/username";
-    //Check if the user already has a writer profile
     public const string HasWriterProfile = "api/writers/hasprofile";
 
     //Literary Work Endpoints
@@ -57,9 +56,12 @@ public class EndpointStrings
     public const string GetLiteraryWorkById = "api/literaryworks/getliterarywork";
     public const string CreateLiteraryWork = "api/literaryworks/create";
     public const string UpdateLiteraryWork = "api/literaryworks/update";
+    //Soft delete or archiving
     public const string DeleteLiteraryWork = "api/literaryworks/delete";
     public const string SearchLiteraryWorks = "api/literaryworks/search";
     public const string GetByGenre = "api/literaryworks/genre";
     public const string GetByType = "api/literaryworks/type";
     public const string GetByAuthor = "api/literaryworks/author";
+    //Unarchive litwork
+    public const string UnarchiveLiteraryWork = "api/literaryworks/unarchive";
 }

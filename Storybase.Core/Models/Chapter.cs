@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-
-namespace Storybase.Core.Models;
+﻿namespace Storybase.Core.Models;
 
 public class Chapter
 {

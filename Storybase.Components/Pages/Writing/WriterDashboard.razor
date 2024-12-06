@@ -1,0 +1,108 @@
+@page "/writing/dashboard"
+@inject WriterClient writerClient
+@inject LiteraryWorkClient litWorkClient
+@inject NavigationManager navManager
+@attribute [Authorize]
+
+<MudContainer>
+    <HeaderComponent Title="Writer's Dashboard" Subtitle="Overview of all your work">
+        <MudButton Href="/writing/add" Variant="Variant.Filled" Color="Color.Primary">
+            Create New Literary Work
+        </MudButton>
+    </HeaderComponent>
+    @if (isBusy)
+    {
+        <LoadingComponent />
+    }
+    else
+    {
+        <MudText Typo="Typo.h5">Your Literary Works</MudText>
+        <MudDivider />
+        <MudGrid Class="mt-8">
+            @foreach (var item in literaryWorks)
+            {
+                <MudItem xs="12" sm="6" md="3">
+                    <MudCard @onclick="() => GoToDetails(item.Id)">
+                        <MudCardMedia Image="@item.CoverImageUrl" Title="@item.Title"/>
+                        <MudCardContent>
+                            <MudText Typo="Typo.h5">@item.Title</MudText>
+                            <MudText Typo="Typo.body1">
+                                Created on: @item.CreatedOn
+                            </MudText>
+                            <MudText Typo="Typo.body1">
+                                Last Modified: @item.LastModified
+                            </MudText>
+                            <MudButton>
+                                @item.Type
+                            </MudButton>
+
+                            @foreach (var genre in item.Genres)
+                            {
+                                <MudContainer class="d-flex flex-gap ga-4">
+                                    <MudChip Value="@genre.Id" Text="@genre.Name">
+                                        @genre.Name
+                                    </MudChip>
+                                </MudContainer>
+                            }
+                        </MudCardContent>
+                        <MudCardActions>
+                            <MudButton Href="@($"/writing/edit/{item.Id}")" Variant="Variant.Filled" Color="Color.Primary">
+                                Edit
+                            </MudButton>
+                            <MudButton OnClick="() => (item.IsDeleted ? ArchiveLitWork(item.Id) : UnarchiveLitWork(item.Id))" 
+                                            Variant="Variant.Filled" 
+                                            Color="Color.Primary">
+                                @(item.IsDeleted ? "Unarchive" : "Archive")
+                            </MudButton>
+                        </MudCardActions>
+                    </MudCard>
+                </MudItem>
+            }
+        </MudGrid>   
+    }
+</MudContainer>
+
+@code {
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationState { get; set; }
+    IEnumerable<LiteraryWork> literaryWorks = Enumerable.Empty<LiteraryWork>();
+    bool isBusy = false;
+    private string Auth0UserId = "";
+
+    protected async override Task OnInitializedAsync()
+    {
+        //Get current logged in user details
+        if (authenticationState is not null)
+        {
+            var state = await authenticationState;
+            //Get user id
+            Auth0UserId = state.User.Claims.FirstOrDefault(c => c.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")?.Value ?? "";
+        }
+
+        await GetLiteraryWorks();
+    }
+
+    private async Task GetLiteraryWorks()
+    {
+        isBusy = true;
+        literaryWorks = await writerClient.GetLiteraryWorksByAuthIdAsync(Auth0UserId ?? "");
+        isBusy = false;
+    }
+
+    //Method to set literary work to delete
+    private async Task ArchiveLitWork(int id)
+    {
+        isBusy = true;
+        await litWorkClient.DeleteLiteraryWorkAsync(id);
+        isBusy = false;
+    }
+
+    private async Task UnarchiveLitWork(int id)
+    {
+        isBusy = true;
+        await litWorkClient.UnarchiveLiteraryWork(id);
+        isBusy = false;
+    }
+
+    private void GoToDetails(int id) => navManager.NavigateTo($"/details/{id}");
+}

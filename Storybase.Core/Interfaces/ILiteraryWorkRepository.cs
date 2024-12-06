@@ -7,5 +7,7 @@ public interface ILiteraryWorkRepository : IRepository<LiteraryWork>
     Task<IEnumerable<LiteraryWork>> GetByGenreAsync(int genreId);
     Task<IEnumerable<LiteraryWork>> GetByTypeAsync(LiteraryWorkType type);
     Task<IEnumerable<LiteraryWork>> GetByAuthorAsync(int authorId);
+    Task SoftDelete(int id);
+    Task Unarchive(int id);
 }
 

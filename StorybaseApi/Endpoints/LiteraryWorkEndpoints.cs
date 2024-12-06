@@ -32,10 +32,16 @@ public static class LiteraryWorkEndpoints
             return TypedResults.Ok("Literary work updated successfully");
         });
         //Delete
-        app.MapDelete(EndpointStrings.DeleteLiteraryWork, async Task<Results<Ok<string>, BadRequest>> (ILiteraryWorkRepository repository, int id) =>
+        app.MapGet(EndpointStrings.DeleteLiteraryWork, async Task<Results<Ok<string>, BadRequest>> (ILiteraryWorkRepository repository, int id) =>
         {
             await repository.DeleteAsync(id);
-            return TypedResults.Ok("Literary work deleted successfully");
+            return TypedResults.Ok("Literary work archived successfully");
+        });
+        //Unarchive
+        app.MapGet(EndpointStrings.UnarchiveLiteraryWork, async Task<Results<Ok<string>, BadRequest>> (ILiteraryWorkRepository repository, int id) =>
+        {
+            await repository.Unarchive(id);
+            return TypedResults.Ok("Literary work unarchived successfully");
         });
         //Search
         app.MapGet(EndpointStrings.SearchLiteraryWorks, async Task<Results<Ok<IEnumerable<LiteraryWork>>, BadRequest>> (ILiteraryWorkRepository repository, string query) =>
@@ -67,6 +73,7 @@ public static class LiteraryWorkEndpoints
             var literaryWorks = await repository.GetByTypeAsync(type);
             return TypedResults.Ok(literaryWorks);
         });
+
 
         return app;
     }

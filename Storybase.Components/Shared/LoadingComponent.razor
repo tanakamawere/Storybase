@@ -1,0 +1,13 @@
+<MudContainer Class="justify-center align-center">
+    <MudSkeleton />
+    <MudSkeleton />
+    <MudSkeleton />
+    <MudText Typo="Typo.h4">
+        @Message
+    </MudText>
+</MudContainer>
+
+@code {
+    [Parameter]
+    public string Message { get; set; } = "Loading";
+}

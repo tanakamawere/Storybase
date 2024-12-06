@@ -4,9 +4,14 @@
 @using Storybase.Core.Models
 @inject LiteraryWorkClient literaryWorkClient
 @inject NavigationManager navManager
+@attribute [Authorize]
 
 
-<MudContainer Class="cards-section" Style="background-color:white">
+<MudContainer Class="cards-section">
+
+
+    <HeaderComponent Title="Explore"
+                     Subtitle="All that Storybase has to offer" />
 
     <MudProgressCircular Color="Color.Default" Indeterminate="true" Class="@(isBusy ? "d-block" : "d-none")" />
 

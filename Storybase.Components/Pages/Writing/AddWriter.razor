@@ -1,10 +1,11 @@
-﻿@page "/addwriter"
+﻿@page "/writing/createwriter"
 @using Storybase.Application.Services
 @using Storybase.Core.DTOs
 @using Storybase.Core.Models
 @inject NavigationManager navManager
 @inject WriterClient writerClient
 @inject ISnackbar Snackbar
+@attribute [Authorize]
 
 <MudContainer MaxWidth="MaxWidth.ExtraExtraLarge" Class="d-flex align-center">
 
@@ -81,6 +82,6 @@
         //Show success message
         Snackbar.Add("Writer account created successfully", Severity.Success);
         //Redirect to home page
-        navManager.NavigateTo("/");
+        navManager.NavigateTo("/writing/dashboard");
     }
 }

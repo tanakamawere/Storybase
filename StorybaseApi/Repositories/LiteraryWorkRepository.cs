@@ -85,4 +85,24 @@ public class LiteraryWorkRepository : ILiteraryWorkRepository
                        .Where(lw => lw.Title == title)
                        .ToListAsync();
     }
+
+    public async Task SoftDelete(int id)
+    {
+        var entity = await _context.LiteraryWorks.FindAsync(id);
+        if (entity != null)
+        {
+            entity.IsDeleted = true;
+            await _context.SaveChangesAsync();
+        }
+    }
+
+    public async Task Unarchive(int id)
+    {
+        var entity = await _context.LiteraryWorks.FindAsync(id);
+        if (entity != null)
+        {
+            entity.IsDeleted = false;
+            await _context.SaveChangesAsync();
+        }
+    }
 }
