@@ -16,80 +16,121 @@
             <DataAnnotationsValidator />
             <ValidationSummary />
 
-            <MudText Typo="Typo.h5">
-                Details Editor
-            </MudText>
-
-            <MudTextField Variant="Variant.Outlined" @bind-Value="litWorkEditorModel.LiteraryWorkDto.Title" Label="Title" Required="true" />
-            <MudTextField Variant="Variant.Outlined" @bind-Value="litWorkEditorModel.LiteraryWorkDto.Summary" Label="Summary" Required="true" />
-            <MudTextField Variant="Variant.Outlined" @bind-Value="litWorkEditorModel.LiteraryWorkDto.CoverImageUrl" Label="Cover Image URL" />
-            <MudSelect Variant="Variant.Outlined"  
-                        T="LiteraryWorkType"
-                        Value="litWorkEditorModel.LiteraryWorkDto.Type"
-                        ValueChanged="OnLiteraryTypeChanged"
-                        Label="Type" 
-                        Required="true">
-                @foreach (LiteraryWorkType item in literaryWorkTypes)
-                {
-                    <MudSelectItem Value="@item">
-                        @item
-                    </MudSelectItem>
-                }
-            </MudSelect>
-
-            <input type="hidden" @bind="litWorkEditorModel.LiteraryWorkDto.Auth0Id" />
-
-            <!--Chips to show the genres-->
-            <MudChipSet Variant="Variant.Text" Color="Color.Info" T="Genre" SelectionMode="SelectionMode.SingleSelection">
-                @foreach (Genre item in selectedGenres)
-                {
-                    <MudChip Ripple="true" OnClick="() => RemoveGenre(item)" Text="@item.Name"></MudChip>
-                }
-            </MudChipSet>
-
-            <!--Autocomplete field for Genre selection-->
-            <MudAutocomplete T="Genre" Label="Genre"
-            Variant="Variant.Outlined"
-            Placeholder="Genre of the work"
-            Value="selectedGenre"
-            ValueChanged="OnGenreSelected"
-            SearchFunc="SearchGenres"
-            ToStringFunc="@(e=> e==null?null : $"{e.Name}")"
-            ResetValueOnEmptyText="true"
-            CoerceText="true" CoerceValue="true">
-            </MudAutocomplete>
-
-
-            <MudStack Justify="Justify.Center" AlignItems="AlignItems.Center">
-                <MudCheckBox @bind-Value="litWorkEditorModel.LiteraryWorkDto.IsFree" Label="Is Free" />
-                <MudSlider Max="1" Min="0" @bind-Value="litWorkEditorModel.LiteraryWorkDto.FreePreviewPercentage" 
-                TickMarks="true" Step="0.1" 
-                Disabled="@(litWorkEditorModel.LiteraryWorkDto.IsFree ? true : false)">
-                    The free preview percentage is @litWorkEditorModel.LiteraryWorkDto.FreePreviewPercentage.ToString("P0")
-                </MudSlider>
-            </MudStack>
-            <MudStack Row="true" Justify="Justify.Center" AlignItems="AlignItems.Center">
-                <MudCheckBox Disabled="@(litWorkEditorModel.LiteraryWorkDto.Type.Equals(LiteraryWorkType.Book) ? false : true)"
-                @bind-Value="litWorkEditorModel.LiteraryWorkDto.ProgressiveWriting"
-                Label="Progressive Writing" />
-                <MudCheckBox @bind-Value="litWorkEditorModel.LiteraryWorkDto.Completed" Label="Completed" />
-            </MudStack>
-
-            <MudDivider/>
-            @for (int i = 0; i < litWorkEditorModel.Chapters.Count; i++)
-            {
-                var index = i;
-
-                <div class="@(showChapterEditor ? "d-block" : "d-none") gap-3">
+            <MudGrid>
+                <MudItem lg="@(litWorkEditorModel.Chapters.Count > 0 ? 6 : 12)"
+                    xxl="@(litWorkEditorModel.Chapters.Count > 0 ? 6 : 12)"
+                xl="@(litWorkEditorModel.Chapters.Count > 0 ? 6 : 12)">
                     <MudText Typo="Typo.h5">
-                        Content Editor
+                        Details Editor
                     </MudText>
 
-                    <MudTextField Variant="Variant.Outlined" @bind-Value="litWorkEditorModel.Chapters[index].Title" Label="Title" Required="true" />
-                    <MudTextField Variant="Variant.Outlined" @bind-Value="litWorkEditorModel.Chapters[index].Content" Label="Content" Required="true"
-                    Lines="10" />
-                </div>
-            }
+                    <MudTextField Variant="Variant.Outlined" @bind-Value="litWorkEditorModel.LiteraryWorkDto.Title" Label="Title" Required="true" />
+                    <MudTextField Variant="Variant.Outlined" @bind-Value="litWorkEditorModel.LiteraryWorkDto.Summary" Label="Summary" Required="true" />
+                    <MudTextField Variant="Variant.Outlined" @bind-Value="litWorkEditorModel.LiteraryWorkDto.CoverImageUrl" Label="Cover Image URL" />
+                    <MudSelect Variant="Variant.Outlined"
+                               T="LiteraryWorkType"
+                               Value="litWorkEditorModel.LiteraryWorkDto.Type"
+                               ValueChanged="OnLiteraryTypeChanged"
+                               Label="Type"
+                               Required="true">
+                        @foreach (LiteraryWorkType item in literaryWorkTypes)
+                        {
+                            <MudSelectItem Value="@item">
+                                @item
+                            </MudSelectItem>
+                        }
+                    </MudSelect>
+
+                    <input type="hidden" @bind="litWorkEditorModel.LiteraryWorkDto.Auth0Id" />
+
+                    <!--Chips to show the genres-->
+                    <MudChipSet Variant="Variant.Text" Color="Color.Info" T="Genre" SelectionMode="SelectionMode.SingleSelection">
+                        @foreach (Genre item in selectedGenres)
+                        {
+                            <MudChip Ripple="true" OnClick="() => RemoveGenre(item)" Text="@item.Name"></MudChip>
+                        }
+                    </MudChipSet>
+
+                    <!--Autocomplete field for Genre selection-->
+                    <MudAutocomplete T="Genre" Label="Genre"
+                                     Variant="Variant.Outlined"
+                                     Placeholder="Genre of the work"
+                                     Value="selectedGenre"
+                                     ValueChanged="OnGenreSelected"
+                                     SearchFunc="SearchGenres"
+                                     ToStringFunc="@(e=> e==null?null : $"{e.Name}")"
+                                     ResetValueOnEmptyText="true"
+                                     CoerceText="true" CoerceValue="true">
+                    </MudAutocomplete>
+
+
+                    <MudStack Justify="Justify.Center" AlignItems="AlignItems.Center">
+                        <MudCheckBox @bind-Value="litWorkEditorModel.LiteraryWorkDto.IsFree" Label="Is Free" />
+                        <MudSlider Max="1" Min="0" @bind-Value="litWorkEditorModel.LiteraryWorkDto.FreePreviewPercentage"
+                                   TickMarks="true" Step="0.1"
+                                   Disabled="@(litWorkEditorModel.LiteraryWorkDto.IsFree ? true : false)">
+                            The free preview percentage is @litWorkEditorModel.LiteraryWorkDto.FreePreviewPercentage.ToString("P0")
+                        </MudSlider>
+                    </MudStack>
+                    <MudStack Row="true" Justify="Justify.Center" AlignItems="AlignItems.Center">
+                        <MudCheckBox Disabled="@(litWorkEditorModel.LiteraryWorkDto.Type.Equals(LiteraryWorkType.Book) ? false : true)"
+                                     @bind-Value="litWorkEditorModel.LiteraryWorkDto.ProgressiveWriting"
+                                     Label="Progressive Writing" />
+                        <MudCheckBox @bind-Value="litWorkEditorModel.LiteraryWorkDto.Completed" Label="Completed" />
+                    </MudStack>
+
+                    <MudDivider />
+                    <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Class="pa-4">
+                        <div>
+                            <MudText Typo="Typo.h5">
+                                Chapter Editor
+                            </MudText>
+                        </div>
+
+                        <!-- Right Content -->
+                        <div>
+                            <MudButton Disabled="@((litWorkEditorModel.Chapters.Count > 0 && !litWorkEditorModel.LiteraryWorkDto.Type.Equals(LiteraryWorkType.Book) ? true : false))" 
+                                        StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Primary" OnClick="AddChapter">
+                                Add Chapter
+                            </MudButton>
+                        </div>
+                    </MudStack>
+                </MudItem>
+                <MudItem lg="@(litWorkEditorModel.Chapters.Count > 0 ? 6 : 0)"
+                    xxl="@(litWorkEditorModel.Chapters.Count > 0 ? 6 : 0)"
+                xl="@(litWorkEditorModel.Chapters.Count > 0 ? 6 : 0)">
+                    <MudContainer Class="@(showChapterEditor ? "d-block gap-3 pa-4" : "d-none gap-3 pa-4")">
+                        @for (int i = 0; i < litWorkEditorModel.Chapters.Count; i++)
+                        {
+                            var index = i;
+
+                            @if (litWorkEditorModel.LiteraryWorkDto.Type == LiteraryWorkType.Book)
+                            {
+                                <MudStack Row="true" Justify="Justify.Center" AlignItems="AlignItems.Center" Class="pa-1">
+                                    <MudText @bind-Value="litWorkEditorModel.Chapters[index].ChapterNumber">
+                                        Chapter @(index + 1)
+                                    </MudText>
+                                    <MudButton Variant="Variant.Outlined" Color="Color.Primary" OnClick="() => NavigateToChapterEditor(litWorkEditorModel.Chapters[index].Id)">
+                                        Edit Chapter
+                                    </MudButton>
+                                </MudStack>
+
+                            }
+                            <MudTextField Typo="Typo.h6" Variant="Variant.Outlined" @bind-Value="litWorkEditorModel.Chapters[index].Title" Label="Title" Required="true" />
+                            @if (!litWorkEditorModel.LiteraryWorkDto.Type.Equals(LiteraryWorkType.Book))
+                            {
+                                <MudTextField Variant="Variant.Outlined" @bind-Value="litWorkEditorModel.Chapters[index].Content" Label="Content" Required="true" Lines="10" />
+                            }
+                            <MudButton Variant="Variant.Outlined" Color="Color.Primary" OnClick="() => RemoveChapter(index)">
+                                Remove Chapter
+                            </MudButton>
+                            <MudDivider />
+
+                        }
+
+                    </MudContainer>
+                </MudItem>
+            </MudGrid>
 
             <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">Submit</MudButton>
             <MudButton ButtonType="ButtonType.Reset" Variant="Variant.Filled" Color="Color.Secondary">Cancel</MudButton>
@@ -163,6 +204,26 @@
         }
     }
 
+    //Method to add chapter
+    private void AddChapter()
+    {
+        //If the lit type is poem or essay, limit the content to 1
+        if (litWorkEditorModel.LiteraryWorkDto.Type.Equals(LiteraryWorkType.Poem) || litWorkEditorModel.LiteraryWorkDto.Type.Equals(LiteraryWorkType.Essay))
+        {
+            if (litWorkEditorModel.Chapters.Count == 1)
+            {
+                Snackbar.Add("You can only add one chapter for this type of literary work", Severity.Info);
+                return;
+            }
+        }
+        litWorkEditorModel.Chapters.Add(new Chapter());
+        showChapterEditor = true;
+    }
+    private void RemoveChapter(int index)
+    {
+        litWorkEditorModel.Chapters.RemoveAt(index);
+    }
+
     private async Task HandleValidSubmit()
     {
         if (id == 0)
@@ -177,7 +238,12 @@
 
     private async Task AddLiteraryWorkAsync()
     {
-        //Add chapter details
+        //If chapters are greater than 1 and the type is not book, throw error
+        if (litWorkEditorModel.Chapters.Count > 1 && !litWorkEditorModel.LiteraryWorkDto.Type.Equals(LiteraryWorkType.Book))
+        {
+            Snackbar.Add("You can only add one chapter for this type of literary work", Severity.Info);
+            return;
+        }
 
         litWorkEditorModel.LiteraryWorkDto.CreatedOn = DateTime.Now;
         litWorkEditorModel.LiteraryWorkDto.LastModified = DateTime.Now;
@@ -200,6 +266,13 @@
 
     private async Task UpdateLiteraryWork()
     {
+        //If chapters are greater than 1 and the type is not book, throw error
+        if (litWorkEditorModel.Chapters.Count > 1 && !litWorkEditorModel.LiteraryWorkDto.Type.Equals(LiteraryWorkType.Book))
+        {
+            Snackbar.Add("You can only add one chapter for this type of literary work", Severity.Info);
+            return;
+        }
+
         litWorkEditorModel.LiteraryWorkDto.LastModified = DateTime.Now;
         litWorkEditorModel.LiteraryWorkDto.Genres = selectedGenres.Select(g => new Genre { Id = g.Id }).ToList();
         litWorkEditorModel.LiteraryWorkDto.Auth0Id = Auth0UserId;
@@ -281,7 +354,14 @@
                 litWorkEditorModel.LiteraryWorkDto.Type = LiteraryWorkType.Book;
                 break;
         }
+        StateHasChanged();
     }
+
+    private void NavigateToChapterEditor(int chapterId)
+    {
+        navManager.NavigateTo($"/writing/edit/chapter/{chapterId}");
+    }
+
 
 
     public class LitWorkEditorModel

@@ -6,17 +6,34 @@
 @inject NavigationManager navManager
 @attribute [Authorize]
 
-
 <MudContainer Class="cards-section">
-
-
-    <HeaderComponent Title="Explore"
-                     Subtitle="All that Storybase has to offer" />
+    <HeaderComponent Title="Explore" Subtitle="All that Storybase has to offer" />
 
     <MudProgressCircular Color="Color.Default" Indeterminate="true" Class="@(isBusy ? "d-block" : "d-none")" />
 
-    <MudGrid Class="mt-8">
-        @foreach (var item in literaryWorks)
+    <MudTextField @bind-Value="searchQuery" 
+                FullWidth="false"
+                Placeholder="Search..." 
+                Variant="Variant.Filled"
+                Adornment="Adornment.Start" 
+                OnKeyUp="OnEnterPressed"
+                AdornmentIcon="@Icons.Material.Filled.Search" 
+                OnAdornmentClick="FilterBySearch" />
+    <MudChipSet T="Genre"
+        Class="ma-1"
+        @bind-SelectedValues="selectedGenres"
+        SelectionMode="SelectionMode.MultiSelection"
+        CheckMark="true"
+        Variant="Variant.Text"
+        Color="Color.Info">
+        @foreach (var genre in genres)
+        {
+            <MudChip>@genre.Name</MudChip>
+        }
+    </MudChipSet>
+
+    <MudGrid>
+        @foreach (var item in filteredLiteraryWorks)
         {
             <MudItem xs="12" sm="6" md="3" Class="@(isBusy ? "d-none" : "d-block")">
                 <MudCard @onclick="() => GoToBookDetails(item.Id)">
@@ -31,13 +48,12 @@
     </MudGrid>
 </MudContainer>
 
-
-
-
 @code {
-    //List of books
     IEnumerable<LiteraryWork> literaryWorks { get; set; } = Enumerable.Empty<LiteraryWork>();
-
+    IEnumerable<LiteraryWork> filteredLiteraryWorks { get; set; } = Enumerable.Empty<LiteraryWork>();
+    string searchQuery { get; set; } = string.Empty;
+    IEnumerable<Genre> genres { get; set; } = Enumerable.Empty<Genre>();
+    IReadOnlyCollection<Genre> selectedGenres { get; set; }
     bool isBusy = false;
 
     protected override async Task OnInitializedAsync()
@@ -53,15 +69,55 @@
         if (response.IsSuccess)
         {
             literaryWorks = response.Data;
+            filteredLiteraryWorks = literaryWorks;
+
+            await LoadGenres();
         }
         else
         {
-            //Show error message
+            // Show error message
         }
         isBusy = false;
     }
 
-    //Go to book details page
+    private async Task LoadGenres()
+    {
+        //Based on the genres inside the literary works, take those genres and add them to the list
+        genres = literaryWorks.SelectMany(lw => lw.Genres).Distinct().ToList();
+    }
+
+    //Search function
+    private void FilterBySearch()
+    {
+        if (string.IsNullOrWhiteSpace(searchQuery))
+        {
+            filteredLiteraryWorks = literaryWorks;
+        }
+        else
+        {
+            filteredLiteraryWorks = literaryWorks.Where(lw => lw.Title.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ||
+                                                              lw.Writer.User.Name.Contains(searchQuery, StringComparison.OrdinalIgnoreCase));
+        }
+    }
+
+    private async Task FilterByGenre(IReadOnlyCollection<Genre> genre)
+    {
+        selectedGenres = genre;
+        if (genre.Count == 0)
+        {
+            filteredLiteraryWorks = literaryWorks;
+        }
+        else
+        {
+            filteredLiteraryWorks = literaryWorks.Where(lw => lw.Genres.Any(g => genre.Contains(g)));
+        }
+    }
+
+    private void OnEnterPressed(KeyboardEventArgs args)
+    {
+        FilterBySearch();
+    }
+
     private void GoToBookDetails(int id)
     {
         navManager.NavigateTo($"/details/{id}");
