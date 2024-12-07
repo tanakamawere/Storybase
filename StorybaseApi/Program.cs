@@ -43,6 +43,7 @@ app.UseHttpsRedirection();
 
 app.MapChapterEndpoints();
 app.MapLiteraryWorkEndpoints();
+app.MapGenreEndpoints();
 app.MapPurchaseEndpoints();
 app.MapUserEndpoints();
 app.MapWriterEndpoints();

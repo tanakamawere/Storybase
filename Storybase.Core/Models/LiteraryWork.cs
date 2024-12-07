@@ -19,13 +19,13 @@ public class LiteraryWork
     public bool IsFree { get; set; }
     [Column(TypeName = "decimal(18, 2)")]
     [Range(0, 1, ErrorMessage = "FreePreviewPercentage must be between 0 and 1.")]
-    public double? FreePreviewPercentage { get; set; } // For essays/poems (e.g., 0.25 = 25% free)
+    public double FreePreviewPercentage { get; set; } // For essays/poems (e.g., 0.25 = 25% free)
 
     // Relationships
     public int WriterId { get; set; }
     public Writer Writer { get; set; }
-    public ICollection<Genre> Genres { get; set; } = new List<Genre>();
-    public ICollection<Chapter> Chapters { get; set; } = new List<Chapter>();
+    public ICollection<Genre> Genres { get; set; }
+    public ICollection<Chapter> Chapters { get; set; }
 
     // For books
     public bool ProgressiveWriting { get; set; } // True if book is being written progressively

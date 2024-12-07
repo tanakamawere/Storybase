@@ -1,6 +1,7 @@
 ﻿using Storybase.Core.Models;
 using Storybase.Core;
 using Storybase.Application.Interfaces;
+using Storybase.Application.Models;
 
 namespace Storybase.Application.Services;
 
@@ -13,33 +14,32 @@ public class ReadingProgressClient
         _apiClient = apiClient;
     }
 
-    public async Task<ReadingProgress> GetReadingProgressByIdAsync(int id)
+    public async Task<ApiResponse<ReadingProgress>> GetReadingProgressByIdAsync(int id)
     {
         return await _apiClient.GetAsync<ReadingProgress>($"{EndpointStrings.GetReadingProgressById}?id={id}");
     }
 
-    public async Task<ReadingProgress> AddReadingProgressAsync(ReadingProgress ReadingProgress)
+    public async Task<ApiResponse<ReadingProgress>> AddReadingProgressAsync(ReadingProgress readingProgress)
     {
-        return await _apiClient.PostAsync<ReadingProgress>($"{EndpointStrings.CreateReadingProgress}", ReadingProgress);
+        return await _apiClient.PostAsync<ReadingProgress>($"{EndpointStrings.CreateReadingProgress}", readingProgress);
     }
 
-    //Delete ReadingProgress
-    public async Task<ReadingProgress> DeleteReadingProgressAsync(int id)
+    public async Task<ApiResponse<ReadingProgress>> DeleteReadingProgressAsync(int id)
     {
         return await _apiClient.DeleteAsync<ReadingProgress>($"{EndpointStrings.DeleteReadingProgress}?id={id}");
     }
-    //update ReadingProgress
-    public async Task<ReadingProgress> UpdateReadingProgressAsync(ReadingProgress ReadingProgress)
+
+    public async Task<ApiResponse<ReadingProgress>> UpdateReadingProgressAsync(ReadingProgress readingProgress)
     {
-        return await _apiClient.PutAsync<ReadingProgress>($"{EndpointStrings.UpdateReadingProgress}", ReadingProgress);
+        return await _apiClient.PutAsync<ReadingProgress>($"{EndpointStrings.UpdateReadingProgress}", readingProgress);
     }
-    //search ReadingProgress
-    public async Task<IEnumerable<ReadingProgress>> SearchReadingProgresssAsync(string search)
+
+    public async Task<ApiResponse<IEnumerable<ReadingProgress>>> SearchReadingProgresssAsync(string search)
     {
         return await _apiClient.GetAsync<IEnumerable<ReadingProgress>>($"{EndpointStrings.SearchReadingProgresss}?query={search}");
     }
-    //Get all ReadingProgresss
-    public async Task<IEnumerable<ReadingProgress>> GetReadingProgresssAsync()
+
+    public async Task<ApiResponse<IEnumerable<ReadingProgress>>> GetReadingProgresssAsync()
     {
         return await _apiClient.GetAsync<IEnumerable<ReadingProgress>>(EndpointStrings.GetAllReadingProgresss);
     }

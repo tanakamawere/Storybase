@@ -1,4 +1,5 @@
-﻿using Storybase.Core.Interfaces;
+﻿using Storybase.Core.DTOs;
+using Storybase.Core.Interfaces;
 using Storybase.Core.Models;
 
 namespace StorybaseApi.Repositories;
@@ -15,13 +16,18 @@ public class LiteraryWorkRepository : ILiteraryWorkRepository
     public async Task<LiteraryWork> GetByIdAsync(int id)
     {
         return await _context.LiteraryWorks
-                             .Include(lw => lw.Genres)  // Eager load genres
+                            .Include(n => n.Writer.User) // Eager load writer
+                             .Include(lw => lw.Genres)// Eager load genres
+                                .Include(lw => lw.Chapters)// Eager load chapters
                              .FirstOrDefaultAsync(lw => lw.Id == id);
     }
 
     public async Task<IEnumerable<LiteraryWork>> GetAllAsync()
     {
-        return await _context.LiteraryWorks.ToListAsync();
+        return await _context.LiteraryWorks
+            .Include(n => n.Writer.User)
+            .Include(n => n.Chapters)
+            .Include(n => n.Genres).ToListAsync();
     }
 
     public async Task<IEnumerable<LiteraryWork>> GetByGenreAsync(int genreId)
@@ -69,6 +75,7 @@ public class LiteraryWorkRepository : ILiteraryWorkRepository
         //Return particular type of literary work
         return await _context.LiteraryWorks
                              .Where(lw => lw.Type == type)
+                             .Include(n => n.Genres)
                              .ToListAsync();
     }
 
@@ -76,6 +83,7 @@ public class LiteraryWorkRepository : ILiteraryWorkRepository
     {
         return await _context.LiteraryWorks
                              .Where(lw => lw.WriterId == authorId)
+                             .Include(n => n.Genres)
                              .ToListAsync();
     }
 
@@ -83,6 +91,7 @@ public class LiteraryWorkRepository : ILiteraryWorkRepository
     {
         return await _context.LiteraryWorks
                        .Where(lw => lw.Title == title)
+                       .Include(n => n.Genres)
                        .ToListAsync();
     }
 
@@ -102,6 +111,76 @@ public class LiteraryWorkRepository : ILiteraryWorkRepository
         if (entity != null)
         {
             entity.IsDeleted = false;
+            await _context.SaveChangesAsync();
+        }
+    }
+
+    public async Task AddDtoAsync(LiteraryWorkDto entity)
+    {
+        LiteraryWork literaryWork = new()
+        {
+            Title = entity.Title,
+            Summary = entity.Summary,
+            CoverImageUrl = entity.CoverImageUrl,
+            Type = entity.Type,
+            IsFree = entity.IsFree,
+            FreePreviewPercentage = entity.FreePreviewPercentage,
+            Writer = await _context.Writers.Where(x => x.User.Auth0UserId == entity.Auth0Id).FirstAsync(),
+            Chapters = entity.Chapters,
+            ProgressiveWriting = entity.ProgressiveWriting,
+            Completed = entity.Completed,
+            IsDeleted = entity.IsDeleted
+        };
+
+        // Attach existing genres to the context
+        literaryWork.Genres = [];
+        foreach (var genreDto in entity.Genres)
+        {
+            var genre = await _context.Genres
+                .FirstOrDefaultAsync(g => g.Id == genreDto.Id);
+
+            if (genre != null)
+            {
+                _context.Attach(genre); // Attach the existing genre
+                literaryWork.Genres.Add(genre);
+            }
+        }
+
+        await _context.LiteraryWorks.AddAsync(literaryWork);
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task UpdateDtoAsync(LiteraryWorkDto entity)
+    {
+        LiteraryWork literaryWork = await _context.LiteraryWorks.FindAsync(entity.Id);
+        if (literaryWork != null)
+        {
+            literaryWork.Title = entity.Title;
+            literaryWork.Summary = entity.Summary;
+            literaryWork.CoverImageUrl = entity.CoverImageUrl;
+            literaryWork.Type = entity.Type;
+            literaryWork.IsFree = entity.IsFree;
+            literaryWork.FreePreviewPercentage = entity.FreePreviewPercentage;
+            literaryWork.Writer = await _context.Writers.Where(x => x.User.Auth0UserId == entity.Auth0Id).FirstAsync();
+
+            // Attach existing genres to the context
+            literaryWork.Genres = [];
+            foreach (var genreDto in entity.Genres)
+            {
+                var genre = await _context.Genres
+                    .FirstOrDefaultAsync(g => g.Id == genreDto.Id);
+
+                if (genre != null)
+                {
+                    _context.Attach(genre); // Attach the existing genre
+                    literaryWork.Genres.Add(genre);
+                }
+            }
+
+            literaryWork.Chapters = entity.Chapters;
+            literaryWork.ProgressiveWriting = entity.ProgressiveWriting;
+            literaryWork.Completed = entity.Completed;
+            literaryWork.IsDeleted = entity.IsDeleted;
             await _context.SaveChangesAsync();
         }
     }

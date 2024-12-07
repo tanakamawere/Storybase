@@ -9,7 +9,8 @@
 
 <MudContainer MaxWidth="MaxWidth.ExtraExtraLarge" Class="d-flex align-center">
 
-    <h3>Sign Up to Become a Writer</h3>
+    <HeaderComponent Title="Writer's Sign Up" Subtitle="Become a publisher on Storybase and monetize your content">
+    </HeaderComponent>
 
     <MudPaper Class="@(isWriter ? "invisible pa-4" : "visible pa-4")" Elevation="4">
         <EditForm OnValidSubmit="OnValidSubmit" Model="writer">
@@ -61,14 +62,18 @@
 
             //Check if user already has a writer account
             //Returns true if user is already a writer
-            isWriter = await writerClient.HasWriterProfileAsync(Auth0UserId);
+            var response = await writerClient.HasWriterProfileAsync(Auth0UserId);
+            if (response.IsSuccess)
+                isWriter = response.Data;
         }
     }
 
     private async void OnValidSubmit()
     {
         //Check if the user name is not already taken
-        if (await writerClient.IsUserNameTakenAsync(writer.UserName))
+
+        var response = await writerClient.IsUserNameTakenAsync(writer.UserName);
+        if (response.Data)
         {
             Snackbar.Add("Username already taken", Severity.Error);
             return;

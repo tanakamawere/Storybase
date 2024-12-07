@@ -19,8 +19,10 @@ public class WriterRepository : GenericRepository<Writer>, IWriterRepository
 
     public async Task<IEnumerable<LiteraryWork>> GetLiteraryWorksByAuthIdAsync(string auth0Id)
     {
-        var writer = await _context.Writers.Include(x => x.LiteraryWorks).FirstOrDefaultAsync(x => x.User.Auth0UserId == auth0Id);
-        return writer.LiteraryWorks;
+        var literary = await _context.LiteraryWorks.Where(x => x.Writer.User.Auth0UserId == auth0Id)
+            .Include(n => n.Genres)
+            .ToListAsync();
+        return literary;
     }
 
     //Get literary works by auth0id for writer profile

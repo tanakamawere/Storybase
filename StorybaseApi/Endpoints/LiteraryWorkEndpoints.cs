@@ -1,4 +1,5 @@
 ﻿using Storybase.Core;
+using Storybase.Core.DTOs;
 using Storybase.Core.Interfaces;
 using Storybase.Core.Models;
 
@@ -18,17 +19,16 @@ public static class LiteraryWorkEndpoints
             }
             return TypedResults.Ok(literaryWork);
         });
-
         //Create a new literary work
-        app.MapPost(EndpointStrings.CreateLiteraryWork, async Task<Results<Ok<string>, BadRequest>> (ILiteraryWorkRepository repository, LiteraryWork createLiteraryWork) =>
+        app.MapPost(EndpointStrings.CreateLiteraryWork, async Task<Results<Ok<string>, BadRequest>> (ILiteraryWorkRepository repository, LiteraryWorkDto createLiteraryWork) =>
         {
-            await repository.AddAsync(createLiteraryWork);
+            await repository.AddDtoAsync(createLiteraryWork);
             return TypedResults.Ok("Literary work created successfully");
         });
         //Update a literary work
-        app.MapPut(EndpointStrings.UpdateLiteraryWork, async Task<Results<Ok<string>, BadRequest>> (ILiteraryWorkRepository repository, LiteraryWork updateLiteraryWork) =>
+        app.MapPut(EndpointStrings.UpdateLiteraryWork, async Task<Results<Ok<string>, BadRequest>> (ILiteraryWorkRepository repository, LiteraryWorkDto updateLiteraryWork) =>
         {
-            await repository.UpdateAsync(updateLiteraryWork);
+            await repository.UpdateDtoAsync(updateLiteraryWork);
             return TypedResults.Ok("Literary work updated successfully");
         });
         //Delete

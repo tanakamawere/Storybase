@@ -16,14 +16,14 @@
     <MudProgressCircular Color="Color.Default" Indeterminate="true" Class="@(isBusy ? "d-block" : "d-none")" />
 
     <MudGrid Class="mt-8">
-        @foreach (var book in literaryWorks)
+        @foreach (var item in literaryWorks)
         {
             <MudItem xs="12" sm="6" md="3" Class="@(isBusy ? "d-none" : "d-block")">
-                <MudCard @onclick="() => GoToBookDetails(book.Id)">
-                    <MudCardMedia Image="@book.CoverImageUrl" Title="@book.Title" />
+                <MudCard @onclick="() => GoToBookDetails(item.Id)">
+                    <MudCardMedia Image="@item.CoverImageUrl" Title="@item.Title" />
                     <MudCardContent>
-                        <MudText Typo="Typo.h5">@book.Title</MudText>
-                        <MudText Typo="Typo.h6">@book.Writer.User.Name</MudText>
+                        <MudText Typo="Typo.h5">@item.Title</MudText>
+                        <MudText Typo="Typo.h6">@item.Writer.User.Name</MudText>
                     </MudCardContent>
                 </MudCard>
             </MudItem>
@@ -49,7 +49,15 @@
     private async Task LoadBooks()
     {
         isBusy = true;
-        literaryWorks = await literaryWorkClient.GetLiteraryWorksAsync();
+        var response = await literaryWorkClient.GetLiteraryWorksAsync();
+        if (response.IsSuccess)
+        {
+            literaryWorks = response.Data;
+        }
+        else
+        {
+            //Show error message
+        }
         isBusy = false;
     }
 

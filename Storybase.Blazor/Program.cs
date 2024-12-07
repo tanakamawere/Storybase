@@ -37,6 +37,8 @@ builder.Services.AddScoped<PurchaseClient>();
 builder.Services.AddScoped<ReadingProgressClient>();
 builder.Services.AddScoped<UserClient>();
 builder.Services.AddScoped<WriterClient>();
+builder.Services.AddScoped<GenresClient>();
+builder.Services.AddScoped<UserService>();
 
 var app = builder.Build();
 

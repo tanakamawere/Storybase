@@ -1,6 +1,7 @@
 ﻿using Storybase.Core.Models;
 using Storybase.Core;
 using Storybase.Application.Interfaces;
+using Storybase.Application.Models;
 
 namespace Storybase.Application.Services;
 
@@ -13,33 +14,32 @@ public class PurchaseClient
         _apiClient = apiClient;
     }
 
-    public async Task<Purchase> GetPurchaseByIdAsync(int id)
+    public async Task<ApiResponse<Purchase>> GetPurchaseByIdAsync(int id)
     {
         return await _apiClient.GetAsync<Purchase>($"{EndpointStrings.GetPurchaseById}?id={id}");
     }
 
-    public async Task<Purchase> AddPurchaseAsync(Purchase Purchase)
+    public async Task<ApiResponse<Purchase>> AddPurchaseAsync(Purchase purchase)
     {
-        return await _apiClient.PostAsync<Purchase>($"{EndpointStrings.CreatePurchase}", Purchase);
+        return await _apiClient.PostAsync<Purchase>($"{EndpointStrings.CreatePurchase}", purchase);
     }
 
-    //Delete Purchase
-    public async Task<Purchase> DeletePurchaseAsync(int id)
+    public async Task<ApiResponse<Purchase>> DeletePurchaseAsync(int id)
     {
         return await _apiClient.DeleteAsync<Purchase>($"{EndpointStrings.DeletePurchase}?id={id}");
     }
-    //update Purchase
-    public async Task<Purchase> UpdatePurchaseAsync(Purchase Purchase)
+
+    public async Task<ApiResponse<Purchase>> UpdatePurchaseAsync(Purchase purchase)
     {
-        return await _apiClient.PutAsync<Purchase>($"{EndpointStrings.UpdatePurchase}", Purchase);
+        return await _apiClient.PutAsync<Purchase>($"{EndpointStrings.UpdatePurchase}", purchase);
     }
-    //search Purchase
-    public async Task<IEnumerable<Purchase>> SearchPurchasesAsync(string search)
+
+    public async Task<ApiResponse<IEnumerable<Purchase>>> SearchPurchasesAsync(string search)
     {
         return await _apiClient.GetAsync<IEnumerable<Purchase>>($"{EndpointStrings.SearchPurchases}?query={search}");
     }
-    //Get all Purchases
-    public async Task<IEnumerable<Purchase>> GetPurchasesAsync()
+
+    public async Task<ApiResponse<IEnumerable<Purchase>>> GetPurchasesAsync()
     {
         return await _apiClient.GetAsync<IEnumerable<Purchase>>(EndpointStrings.GetAllPurchases);
     }

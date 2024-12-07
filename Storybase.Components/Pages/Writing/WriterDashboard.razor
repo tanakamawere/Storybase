@@ -2,6 +2,7 @@
 @inject WriterClient writerClient
 @inject LiteraryWorkClient litWorkClient
 @inject NavigationManager navManager
+@inject UserService userService
 @attribute [Authorize]
 
 <MudContainer>
@@ -16,8 +17,6 @@
     }
     else
     {
-        <MudText Typo="Typo.h5">Your Literary Works</MudText>
-        <MudDivider />
         <MudGrid Class="mt-8">
             @foreach (var item in literaryWorks)
             {
@@ -26,32 +25,27 @@
                         <MudCardMedia Image="@item.CoverImageUrl" Title="@item.Title"/>
                         <MudCardContent>
                             <MudText Typo="Typo.h5">@item.Title</MudText>
-                            <MudText Typo="Typo.body1">
-                                Created on: @item.CreatedOn
-                            </MudText>
-                            <MudText Typo="Typo.body1">
-                                Last Modified: @item.LastModified
-                            </MudText>
-                            <MudButton>
-                                @item.Type
-                            </MudButton>
 
+                            <MudText Typo="Typo.subtitle2">
+                                Created on: @item.CreatedOn.ToString("dddd dd MMM, yyyy")
+                            </MudText>
+                            <MudText Typo="Typo.subtitle2">
+                                Last Modified: @(item.LastModified.HasValue ? item.LastModified.Value.ToString("dddd dd MMM, yyyy") : "N/A")
+                            </MudText>
                             @foreach (var genre in item.Genres)
                             {
-                                <MudContainer class="d-flex flex-gap ga-4">
-                                    <MudChip Value="@genre.Id" Text="@genre.Name">
+                                <MudStack Row="true">
+                                    <MudChip Size="Size.Small" Value="@genre.Id" Text="@genre.Name">
                                         @genre.Name
                                     </MudChip>
-                                </MudContainer>
+                                </MudStack>
                             }
                         </MudCardContent>
                         <MudCardActions>
-                            <MudButton Href="@($"/writing/edit/{item.Id}")" Variant="Variant.Filled" Color="Color.Primary">
+                            <MudButton Href="@($"/writing/edit/{item.Id}")">
                                 Edit
                             </MudButton>
-                            <MudButton OnClick="() => (item.IsDeleted ? ArchiveLitWork(item.Id) : UnarchiveLitWork(item.Id))" 
-                                            Variant="Variant.Filled" 
-                                            Color="Color.Primary">
+                            <MudButton OnClick="() => (item.IsDeleted ? ArchiveLitWork(item.Id) : UnarchiveLitWork(item.Id))">
                                 @(item.IsDeleted ? "Unarchive" : "Archive")
                             </MudButton>
                         </MudCardActions>
@@ -65,9 +59,9 @@
 @code {
     [CascadingParameter]
     private Task<AuthenticationState> authenticationState { get; set; }
+    private string Auth0UserId = "";
     IEnumerable<LiteraryWork> literaryWorks = Enumerable.Empty<LiteraryWork>();
     bool isBusy = false;
-    private string Auth0UserId = "";
 
     protected async override Task OnInitializedAsync()
     {
@@ -85,7 +79,11 @@
     private async Task GetLiteraryWorks()
     {
         isBusy = true;
-        literaryWorks = await writerClient.GetLiteraryWorksByAuthIdAsync(Auth0UserId ?? "");
+        var apiResponse = await writerClient.GetLiteraryWorksByAuthIdAsync(Auth0UserId);
+        if (apiResponse.IsSuccess)
+        {
+            literaryWorks = apiResponse.Data;
+        }
         isBusy = false;
     }
 
@@ -100,7 +98,7 @@
     private async Task UnarchiveLitWork(int id)
     {
         isBusy = true;
-        await litWorkClient.UnarchiveLiteraryWork(id);
+        await litWorkClient.UnarchiveLiteraryWorkAsync(id);
         isBusy = false;
     }
 

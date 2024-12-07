@@ -1,42 +1,42 @@
 ﻿using Storybase.Core.Models;
-using Storybase.Core;
 using Storybase.Application.Interfaces;
+using Storybase.Application.Models;
+using Storybase.Core;
 
-namespace Storybase.Application.Services;
-
-public class ChapterClient
+namespace Storybase.Application.Services
 {
-    private readonly IApiClient _apiClient;
+    public class ChapterClient
+    {
+        private readonly IApiClient _apiClient;
 
-    public ChapterClient(IApiClient apiClient)
-    {
-        _apiClient = apiClient;
-    }
+        public ChapterClient(IApiClient apiClient)
+        {
+            _apiClient = apiClient;
+        }
 
-    public async Task<Chapter> GetChapterByIdAsync(int id)
-    {
-        return await _apiClient.GetAsync<Chapter>($"{EndpointStrings.GetChapterById}?id={id}");
-    }
+        public async Task<ApiResponse<Chapter>> GetChapterByIdAsync(int id)
+        {
+            return await _apiClient.GetAsync<Chapter>($"{EndpointStrings.GetChapterById}?id={id}");
+        }
 
-    public async Task<Chapter> AddChapterAsync(Chapter Chapter)
-    {
-        return await _apiClient.PostAsync<Chapter>($"{EndpointStrings.CreateChapter}", Chapter);
-    }
+        public async Task<ApiResponse<Chapter>> AddChapterAsync(Chapter chapter)
+        {
+            return await _apiClient.PostAsync<Chapter>($"{EndpointStrings.CreateChapter}", chapter);
+        }
 
-    //Delete Chapter
-    public async Task<Chapter> DeleteChapterAsync(int id)
-    {
-        return await _apiClient.DeleteAsync<Chapter>($"{EndpointStrings.DeleteChapter}?id={id}");
-    }
-    //update Chapter
-    public async Task<Chapter> UpdateChapterAsync(Chapter Chapter)
-    {
-        return await _apiClient.PutAsync<Chapter>($"{EndpointStrings.UpdateChapter}", Chapter);
-    }
-    //search Chapter
-    public async Task<IEnumerable<Chapter>> SearchChaptersAsync(string search)
-    {
-        return await _apiClient.GetAsync<IEnumerable<Chapter>>($"{EndpointStrings.SearchChapters}?query={search}");
+        public async Task<ApiResponse<string>> DeleteChapterAsync(int id)
+        {
+            return await _apiClient.DeleteAsync<string>($"{EndpointStrings.DeleteChapter}?id={id}");
+        }
+
+        public async Task<ApiResponse<Chapter>> UpdateChapterAsync(Chapter chapter)
+        {
+            return await _apiClient.PutAsync<Chapter>($"{EndpointStrings.UpdateChapter}", chapter);
+        }
+
+        public async Task<ApiResponse<IEnumerable<Chapter>>> SearchChaptersAsync(string search)
+        {
+            return await _apiClient.GetAsync<IEnumerable<Chapter>>($"{EndpointStrings.SearchChapters}?query={search}");
+        }
     }
 }
-

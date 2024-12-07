@@ -1,6 +1,7 @@
 ﻿using Storybase.Core.Models;
 using Storybase.Core;
 using Storybase.Application.Interfaces;
+using Storybase.Application.Models;
 
 namespace Storybase.Application.Services;
 
@@ -13,33 +14,32 @@ public class UserClient
         _apiClient = apiClient;
     }
 
-    public async Task<User> GetUserByIdAsync(int id)
+    public async Task<ApiResponse<User>> GetUserByIdAsync(int id)
     {
         return await _apiClient.GetAsync<User>($"{EndpointStrings.GetUserById}?id={id}");
     }
 
-    public async Task<User> AddUserAsync(User User)
+    public async Task<ApiResponse<User>> AddUserAsync(User user)
     {
-        return await _apiClient.PostAsync<User>($"{EndpointStrings.CreateUser}", User);
+        return await _apiClient.PostAsync<User>($"{EndpointStrings.CreateUser}", user);
     }
 
-    //Delete User
-    public async Task<User> DeleteUserAsync(int id)
+    public async Task<ApiResponse<User>> DeleteUserAsync(int id)
     {
         return await _apiClient.DeleteAsync<User>($"{EndpointStrings.DeleteUser}?id={id}");
     }
-    //update User
-    public async Task<User> UpdateUserAsync(User User)
+
+    public async Task<ApiResponse<User>> UpdateUserAsync(User user)
     {
-        return await _apiClient.PutAsync<User>($"{EndpointStrings.UpdateUser}", User);
+        return await _apiClient.PutAsync<User>($"{EndpointStrings.UpdateUser}", user);
     }
-    //search User
-    public async Task<IEnumerable<User>> SearchUsersAsync(string search)
+
+    public async Task<ApiResponse<IEnumerable<User>>> SearchUsersAsync(string search)
     {
         return await _apiClient.GetAsync<IEnumerable<User>>($"{EndpointStrings.SearchUsers}?query={search}");
     }
-    //Get all users
-    public async Task<IEnumerable<User>> GetUsersAsync()
+
+    public async Task<ApiResponse<IEnumerable<User>>> GetUsersAsync()
     {
         return await _apiClient.GetAsync<IEnumerable<User>>(EndpointStrings.GetAllUsers);
     }

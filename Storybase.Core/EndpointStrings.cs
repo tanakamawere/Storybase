@@ -64,4 +64,8 @@ public class EndpointStrings
     public const string GetByAuthor = "api/literaryworks/author";
     //Unarchive litwork
     public const string UnarchiveLiteraryWork = "api/literaryworks/unarchive";
+
+    //Genres
+    public const string GetAllGenres = "api/genres";
+    public const string GetGenreById = "api/genres/getgenre";
 }

@@ -1,8 +1,220 @@
 ﻿@page "/writing/add"
-@page "/writing/edit/{id}"
+@page "/writing/edit/{id:int}"
+@using Storybase.Core.DTOs
+@inject LiteraryWorkClient literaryWorkClient
+@inject GenresClient genreClient
+@inject ISnackbar Snackbar
+@inject NavigationManager navManager
 @attribute [Authorize]
+
+<MudContainer MaxWidth="MaxWidth.Medium">
+
+    <HeaderComponent Title="Editor" Subtitle="Add, delete or edit your work">
+    </HeaderComponent>
+    <MudPaper Elevation="4" Class="pa-4">
+        <EditForm Model="literaryWorkDto" OnValidSubmit="HandleValidSubmit">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+            <MudTextField Variant="Variant.Outlined" @bind-Value="literaryWorkDto.Title" Label="Title" Required="true" />
+            <MudTextField Variant="Variant.Outlined" @bind-Value="literaryWorkDto.Summary" Label="Summary" Required="true" />
+            <MudTextField Variant="Variant.Outlined" @bind-Value="literaryWorkDto.CoverImageUrl" Label="Cover Image URL" />
+            <MudSelect Variant="Variant.Outlined" @bind-Value="literaryWorkDto.Type" Label="Type" Required="true">
+                @foreach (LiteraryWorkType item in literaryWorkTypes)
+                {
+                    <MudSelectItem Value="@item">
+                        @item
+                    </MudSelectItem>
+                }
+            </MudSelect>
+
+            <input type="hidden" @bind="literaryWorkDto.Auth0Id" />
+
+            <!--Chips to show the genres-->
+            <MudChipSet Variant="Variant.Text" Color="Color.Info" T="Genre" SelectionMode="SelectionMode.SingleSelection">
+                @foreach (Genre item in selectedGenres)
+                {
+                    <MudChip Ripple="true" OnClick="() => RemoveGenre(item)" Text="@item.Name"></MudChip>
+                }
+            </MudChipSet>
+
+            <!--Autocomplete field for Genre selection-->
+            <MudAutocomplete T="Genre" Label="Genre"
+            Variant="Variant.Outlined"
+            Placeholder="Genre of the work"
+            Value="selectedGenre"
+            ValueChanged="OnGenreSelected"
+            SearchFunc="SearchGenres"
+            ToStringFunc="@(e=> e==null?null : $"{e.Name}")"
+            ResetValueOnEmptyText="true"
+            CoerceText="true" CoerceValue="true">
+            </MudAutocomplete>
+
+
+            <MudStack Justify="Justify.Center" AlignItems="AlignItems.Center">
+                <MudCheckBox @bind-Value="literaryWorkDto.IsFree" Label="Is Free" />
+                <MudSlider Max="1" Min="0" @bind-Value="literaryWork.FreePreviewPercentage" TickMarks="true" Step="0.1" Disabled="@(literaryWorkDto.IsFree ? true : false)">
+                    The free preview percentage is @literaryWork.FreePreviewPercentage.ToString("P0")
+                </MudSlider>
+            </MudStack>
+            <MudStack Row="true" Justify="Justify.Center" AlignItems="AlignItems.Center">
+                <MudCheckBox Disabled="@(literaryWorkDto.Type.Equals(LiteraryWorkType.Book) ? false : true)"
+                @bind-Value="literaryWorkDto.ProgressiveWriting"
+                Label="Progressive Writing" />
+                <MudCheckBox @bind-Value="literaryWorkDto.Completed" Label="Completed" />
+            </MudStack>
+            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">Submit</MudButton>
+        </EditForm>
+    </MudPaper>
+</MudContainer>
+
 
 @code {
     [Parameter]
     public int id { get; set; } = 0;
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationState { get; set; }
+    private string Auth0UserId = "";
+
+    private LiteraryWorkDto literaryWorkDto = new();
+    private LiteraryWork literaryWork = new();
+
+    private List<LiteraryWorkType> literaryWorkTypes = Enum.GetValues(typeof(LiteraryWorkType)).Cast<LiteraryWorkType>().ToList();
+    IEnumerable<Genre> Genres = Enumerable.Empty<Genre>();
+    private List<Genre> selectedGenres = new List<Genre>();
+    private Genre selectedGenre = new();
+    private Snackbar snackbar;
+
+    protected override async Task OnInitializedAsync()
+    {
+        //Get genres
+        var genreResponse = await genreClient.GetAllGenresAsync();
+        if (genreResponse.IsSuccess)
+        {
+            Genres = genreResponse.Data;
+        }
+
+        //Get current logged in user details
+        if (authenticationState is not null)
+        {
+            var state = await authenticationState;
+            //Get user id
+            Auth0UserId = state.User.Claims.FirstOrDefault(c => c.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")?.Value ?? "";
+        }
+
+        if (id != 0)
+        {
+            var apiResponse = await literaryWorkClient.GetLiteraryWorkByIdAsync(id);
+            if (apiResponse.IsSuccess)
+            {
+                literaryWork = apiResponse.Data; 
+                literaryWorkDto = new LiteraryWorkDto
+                    {
+                        Id = literaryWork.Id,
+                        Title = literaryWork.Title,
+                        Summary = literaryWork.Summary,
+                        CoverImageUrl = literaryWork.CoverImageUrl,
+                        Type = literaryWork.Type,
+                        IsFree = literaryWork.IsFree,
+                        FreePreviewPercentage = literaryWork.FreePreviewPercentage,
+                        ProgressiveWriting = literaryWork.ProgressiveWriting,
+                        Completed = literaryWork.Completed
+                    };
+            }
+        }
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        if (id == 0)
+        {
+            await AddLiteraryWorkAsync();
+        }
+        else
+        {
+            await UpdateLiteraryWork();
+        }
+    }
+
+    private async Task AddLiteraryWorkAsync()
+    {
+        literaryWorkDto.CreatedOn = DateTime.Now;
+        literaryWorkDto.LastModified = DateTime.Now;
+        literaryWorkDto.Genres = selectedGenres.Select(g => new Genre { Id = g.Id }).ToList();
+        literaryWorkDto.Auth0Id = Auth0UserId;
+        literaryWorkDto.Chapters = new List<Chapter>();
+        literaryWorkDto.IsDeleted = false;
+
+        var response = await literaryWorkClient.AddLiteraryWorkAsync(literaryWorkDto);
+        if (response.IsSuccess)
+        {
+            Snackbar.Add("Literary work added successfully", Severity.Success);
+            navManager.NavigateTo("/writing/dashboard");
+        }
+        else
+        {
+            Snackbar.Add("Failed to add literary work", Severity.Error);
+        }
+    }
+
+    private async Task UpdateLiteraryWork()
+    {
+        literaryWorkDto.LastModified = DateTime.Now;
+        literaryWorkDto.Genres = selectedGenres.Select(g => new Genre { Id = g.Id }).ToList();
+        literaryWorkDto.Auth0Id = Auth0UserId;
+        literaryWorkDto.Chapters = new List<Chapter>();
+        literaryWorkDto.IsDeleted = false;
+
+        var response = await literaryWorkClient.UpdateLiteraryWorkAsync(literaryWorkDto);
+        if (response.IsSuccess)
+        {
+            Snackbar.Add("Literary work updated successfully", Severity.Success);
+            navManager.NavigateTo("/writing/dashboard");
+        }
+        else
+        {
+            Snackbar.Add("Failed to update literary work", Severity.Error);
+        }
+    }
+
+    //Genre selection
+    private void OnGenreSelected(Genre genre)
+    {
+        if (genre != null)
+        {
+            //Check if the genre is already selected
+            if (selectedGenres.Contains(genre))
+            {
+                //Show error message
+                Snackbar.Add("Genre already selected", Severity.Info);
+                return;
+            }
+
+            //Max of 3 genres
+            if (selectedGenres.Count < 3)
+            {
+                selectedGenres.Add(genre);
+            }
+            else
+            {
+                //Show error message
+                Snackbar.Add("You can only select up to 3 genres", Severity.Info);
+            }
+        }
+    }
+
+    private async Task<IEnumerable<Genre>> SearchGenres(string value, CancellationToken token)
+    {
+        if (string.IsNullOrEmpty(value))
+            return Genres.ToList();
+        return Genres.Where(n => n.Name.ToLower().Contains(value.ToLower()))
+                     .ToList();
+    }
+
+    private void RemoveGenre(Genre genre)
+    {
+        if (genre != null)
+        {
+            selectedGenres.Remove(genre);
+        }
+    }
 }
