@@ -12,13 +12,23 @@
     <HeaderComponent Title="Editor" Subtitle="Add, delete or edit your work">
     </HeaderComponent>
     <MudPaper Elevation="4" Class="pa-4">
-        <EditForm Model="literaryWorkDto" OnValidSubmit="HandleValidSubmit">
+        <EditForm Model="litWorkEditorModel" OnValidSubmit="HandleValidSubmit">
             <DataAnnotationsValidator />
             <ValidationSummary />
-            <MudTextField Variant="Variant.Outlined" @bind-Value="literaryWorkDto.Title" Label="Title" Required="true" />
-            <MudTextField Variant="Variant.Outlined" @bind-Value="literaryWorkDto.Summary" Label="Summary" Required="true" />
-            <MudTextField Variant="Variant.Outlined" @bind-Value="literaryWorkDto.CoverImageUrl" Label="Cover Image URL" />
-            <MudSelect Variant="Variant.Outlined" @bind-Value="literaryWorkDto.Type" Label="Type" Required="true">
+
+            <MudText Typo="Typo.h5">
+                Details Editor
+            </MudText>
+
+            <MudTextField Variant="Variant.Outlined" @bind-Value="litWorkEditorModel.LiteraryWorkDto.Title" Label="Title" Required="true" />
+            <MudTextField Variant="Variant.Outlined" @bind-Value="litWorkEditorModel.LiteraryWorkDto.Summary" Label="Summary" Required="true" />
+            <MudTextField Variant="Variant.Outlined" @bind-Value="litWorkEditorModel.LiteraryWorkDto.CoverImageUrl" Label="Cover Image URL" />
+            <MudSelect Variant="Variant.Outlined"  
+                        T="LiteraryWorkType"
+                        Value="litWorkEditorModel.LiteraryWorkDto.Type"
+                        ValueChanged="OnLiteraryTypeChanged"
+                        Label="Type" 
+                        Required="true">
                 @foreach (LiteraryWorkType item in literaryWorkTypes)
                 {
                     <MudSelectItem Value="@item">
@@ -27,7 +37,7 @@
                 }
             </MudSelect>
 
-            <input type="hidden" @bind="literaryWorkDto.Auth0Id" />
+            <input type="hidden" @bind="litWorkEditorModel.LiteraryWorkDto.Auth0Id" />
 
             <!--Chips to show the genres-->
             <MudChipSet Variant="Variant.Text" Color="Color.Info" T="Genre" SelectionMode="SelectionMode.SingleSelection">
@@ -51,18 +61,39 @@
 
 
             <MudStack Justify="Justify.Center" AlignItems="AlignItems.Center">
-                <MudCheckBox @bind-Value="literaryWorkDto.IsFree" Label="Is Free" />
-                <MudSlider Max="1" Min="0" @bind-Value="literaryWork.FreePreviewPercentage" TickMarks="true" Step="0.1" Disabled="@(literaryWorkDto.IsFree ? true : false)">
-                    The free preview percentage is @literaryWork.FreePreviewPercentage.ToString("P0")
+                <MudCheckBox @bind-Value="litWorkEditorModel.LiteraryWorkDto.IsFree" Label="Is Free" />
+                <MudSlider Max="1" Min="0" @bind-Value="litWorkEditorModel.LiteraryWorkDto.FreePreviewPercentage" 
+                TickMarks="true" Step="0.1" 
+                Disabled="@(litWorkEditorModel.LiteraryWorkDto.IsFree ? true : false)">
+                    The free preview percentage is @litWorkEditorModel.LiteraryWorkDto.FreePreviewPercentage.ToString("P0")
                 </MudSlider>
             </MudStack>
             <MudStack Row="true" Justify="Justify.Center" AlignItems="AlignItems.Center">
-                <MudCheckBox Disabled="@(literaryWorkDto.Type.Equals(LiteraryWorkType.Book) ? false : true)"
-                @bind-Value="literaryWorkDto.ProgressiveWriting"
+                <MudCheckBox Disabled="@(litWorkEditorModel.LiteraryWorkDto.Type.Equals(LiteraryWorkType.Book) ? false : true)"
+                @bind-Value="litWorkEditorModel.LiteraryWorkDto.ProgressiveWriting"
                 Label="Progressive Writing" />
-                <MudCheckBox @bind-Value="literaryWorkDto.Completed" Label="Completed" />
+                <MudCheckBox @bind-Value="litWorkEditorModel.LiteraryWorkDto.Completed" Label="Completed" />
             </MudStack>
+
+            <MudDivider/>
+            @for (int i = 0; i < litWorkEditorModel.Chapters.Count; i++)
+            {
+                var index = i;
+
+                <div class="@(showChapterEditor ? "d-block" : "d-none") gap-3">
+                    <MudText Typo="Typo.h5">
+                        Content Editor
+                    </MudText>
+
+                    <MudTextField Variant="Variant.Outlined" @bind-Value="litWorkEditorModel.Chapters[index].Title" Label="Title" Required="true" />
+                    <MudTextField Variant="Variant.Outlined" @bind-Value="litWorkEditorModel.Chapters[index].Content" Label="Content" Required="true"
+                    Lines="10" />
+                </div>
+            }
+
             <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">Submit</MudButton>
+            <MudButton ButtonType="ButtonType.Reset" Variant="Variant.Filled" Color="Color.Secondary">Cancel</MudButton>
+
         </EditForm>
     </MudPaper>
 </MudContainer>
@@ -73,13 +104,14 @@
     public int id { get; set; } = 0;
     [CascadingParameter]
     private Task<AuthenticationState> authenticationState { get; set; }
+    private bool showChapterEditor = false;
     private string Auth0UserId = "";
 
-    private LiteraryWorkDto literaryWorkDto = new();
+    private LitWorkEditorModel litWorkEditorModel = new();
     private LiteraryWork literaryWork = new();
 
     private List<LiteraryWorkType> literaryWorkTypes = Enum.GetValues(typeof(LiteraryWorkType)).Cast<LiteraryWorkType>().ToList();
-    IEnumerable<Genre> Genres = Enumerable.Empty<Genre>();
+    List<Genre> Genres = new();
     private List<Genre> selectedGenres = new List<Genre>();
     private Genre selectedGenre = new();
     private Snackbar snackbar;
@@ -90,7 +122,7 @@
         var genreResponse = await genreClient.GetAllGenresAsync();
         if (genreResponse.IsSuccess)
         {
-            Genres = genreResponse.Data;
+            Genres = genreResponse.Data.ToList();
         }
 
         //Get current logged in user details
@@ -107,18 +139,26 @@
             if (apiResponse.IsSuccess)
             {
                 literaryWork = apiResponse.Data; 
-                literaryWorkDto = new LiteraryWorkDto
-                    {
-                        Id = literaryWork.Id,
-                        Title = literaryWork.Title,
-                        Summary = literaryWork.Summary,
-                        CoverImageUrl = literaryWork.CoverImageUrl,
-                        Type = literaryWork.Type,
-                        IsFree = literaryWork.IsFree,
-                        FreePreviewPercentage = literaryWork.FreePreviewPercentage,
-                        ProgressiveWriting = literaryWork.ProgressiveWriting,
-                        Completed = literaryWork.Completed
-                    };
+                litWorkEditorModel.LiteraryWorkDto = new LiteraryWorkDto
+                {
+                    Id = literaryWork.Id,
+                    Title = literaryWork.Title,
+                    Summary = literaryWork.Summary,
+                    CoverImageUrl = literaryWork.CoverImageUrl,
+                    Type = literaryWork.Type,
+                    IsFree = literaryWork.IsFree,
+                    FreePreviewPercentage = literaryWork.FreePreviewPercentage,
+                    ProgressiveWriting = literaryWork.ProgressiveWriting,
+                    Completed = literaryWork.Completed
+                };
+                litWorkEditorModel.LiteraryWorkDto.Type = literaryWork.Type;
+                selectedGenres = literaryWork.Genres.ToList();
+
+                if (!literaryWork.Type.Equals(LiteraryWorkType.Book))
+                {
+                    showChapterEditor = true;
+                    litWorkEditorModel.Chapters = literaryWork.Chapters.ToList();
+                }
             }
         }
     }
@@ -137,14 +177,16 @@
 
     private async Task AddLiteraryWorkAsync()
     {
-        literaryWorkDto.CreatedOn = DateTime.Now;
-        literaryWorkDto.LastModified = DateTime.Now;
-        literaryWorkDto.Genres = selectedGenres.Select(g => new Genre { Id = g.Id }).ToList();
-        literaryWorkDto.Auth0Id = Auth0UserId;
-        literaryWorkDto.Chapters = new List<Chapter>();
-        literaryWorkDto.IsDeleted = false;
+        //Add chapter details
 
-        var response = await literaryWorkClient.AddLiteraryWorkAsync(literaryWorkDto);
+        litWorkEditorModel.LiteraryWorkDto.CreatedOn = DateTime.Now;
+        litWorkEditorModel.LiteraryWorkDto.LastModified = DateTime.Now;
+        litWorkEditorModel.LiteraryWorkDto.Genres = selectedGenres.Select(g => new Genre { Id = g.Id }).ToList();
+        litWorkEditorModel.LiteraryWorkDto.Auth0Id = Auth0UserId;
+        litWorkEditorModel.LiteraryWorkDto.Chapters = litWorkEditorModel.Chapters;
+        litWorkEditorModel.LiteraryWorkDto.IsDeleted = false;
+
+        var response = await literaryWorkClient.AddLiteraryWorkAsync(litWorkEditorModel.LiteraryWorkDto);
         if (response.IsSuccess)
         {
             Snackbar.Add("Literary work added successfully", Severity.Success);
@@ -158,13 +200,13 @@
 
     private async Task UpdateLiteraryWork()
     {
-        literaryWorkDto.LastModified = DateTime.Now;
-        literaryWorkDto.Genres = selectedGenres.Select(g => new Genre { Id = g.Id }).ToList();
-        literaryWorkDto.Auth0Id = Auth0UserId;
-        literaryWorkDto.Chapters = new List<Chapter>();
-        literaryWorkDto.IsDeleted = false;
+        litWorkEditorModel.LiteraryWorkDto.LastModified = DateTime.Now;
+        litWorkEditorModel.LiteraryWorkDto.Genres = selectedGenres.Select(g => new Genre { Id = g.Id }).ToList();
+        litWorkEditorModel.LiteraryWorkDto.Auth0Id = Auth0UserId;
+        litWorkEditorModel.LiteraryWorkDto.Chapters = litWorkEditorModel.Chapters;
+        litWorkEditorModel.LiteraryWorkDto.IsDeleted = false;
 
-        var response = await literaryWorkClient.UpdateLiteraryWorkAsync(literaryWorkDto);
+        var response = await literaryWorkClient.UpdateLiteraryWorkAsync(litWorkEditorModel.LiteraryWorkDto);
         if (response.IsSuccess)
         {
             Snackbar.Add("Literary work updated successfully", Severity.Success);
@@ -216,5 +258,35 @@
         {
             selectedGenres.Remove(genre);
         }
+    }
+
+    //For UI manipulation depending on Lit type
+    private void OnLiteraryTypeChanged(LiteraryWorkType literaryWorkType)
+    {
+        switch (literaryWorkType)
+        {
+            case LiteraryWorkType.Book:
+                litWorkEditorModel.LiteraryWorkDto.Type = LiteraryWorkType.Book;
+                showChapterEditor = false;
+                break;
+            case LiteraryWorkType.Essay:
+                litWorkEditorModel.LiteraryWorkDto.Type = LiteraryWorkType.Essay;
+                showChapterEditor = true;
+                break;
+            case LiteraryWorkType.Poem:
+                litWorkEditorModel.LiteraryWorkDto.Type = LiteraryWorkType.Poem;
+                showChapterEditor = true;
+                break;
+            default:
+                litWorkEditorModel.LiteraryWorkDto.Type = LiteraryWorkType.Book;
+                break;
+        }
+    }
+
+
+    public class LitWorkEditorModel
+    {
+        public LiteraryWorkDto LiteraryWorkDto { get; set; } = new();
+        public List<Chapter> Chapters { get; set; } = new();
     }
 }

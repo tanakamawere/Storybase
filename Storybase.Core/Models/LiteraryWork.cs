@@ -37,7 +37,6 @@ public class LiteraryWork
 public enum LiteraryWorkType
 {
     Book,
-    Prose,
     Poem,
     Essay
 }

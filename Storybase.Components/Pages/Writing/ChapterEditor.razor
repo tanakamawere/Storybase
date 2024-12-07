@@ -1,0 +1,82 @@
+﻿@page "/writing/chapter-editor"
+@using Storybase.Core.Models
+@inject ISnackbar Snackbar
+@inject ChapterClient chapterClient
+@attribute [Authorize]
+
+<MudContainer MaxWidth="MaxWidth.Medium">
+    <HeaderComponent Title="Chapter Editor" Subtitle="Add or edit your chapter">
+    </HeaderComponent>
+    <MudPaper Elevation="4" Class="pa-4">
+        <EditForm Model="chapter" OnValidSubmit="HandleValidSubmit">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+            <MudTextField Variant="Variant.Outlined" @bind-Value="chapter.Title" Label="Title" Required="true" />
+            <MudTextField Variant="Variant.Outlined" @bind-Value="chapter.Content" Label="Content" Required="true" Lines="10" />
+            <MudTextField Variant="Variant.Outlined" @bind-Value="chapter.ChapterNumber" Label="Chapter Number" Required="true" />
+            <MudDatePicker @bind-Value="chapter.DatePosted" Label="Date Posted" Required="true" />
+            <MudCheckBox @bind-Value="chapter.IsDeleted" Label="Is Deleted" />
+            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">Submit</MudButton>
+        </EditForm>
+    </MudPaper>
+</MudContainer>
+
+@code {
+    [Parameter]
+    public int Id { get; set; } = 0;
+    private Chapter chapter = new Chapter();
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (Id != 0)
+        {
+            var response = await chapterClient.GetChapterByIdAsync(Id);
+            if (response.IsSuccess)
+            {
+                chapter = response.Data;
+            }
+            else
+            {
+                Snackbar.Add("Failed to load chapter", Severity.Error);
+            }
+        }
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        if (Id == 0)
+        {
+            await AddChapterAsync();
+        }
+        else
+        {
+            await UpdateChapterAsync();
+        }
+    }
+
+    private async Task AddChapterAsync()
+    {
+        var response = await chapterClient.AddChapterAsync(chapter);
+        if (response.IsSuccess)
+        {
+            Snackbar.Add("Chapter added successfully", Severity.Success);
+        }
+        else
+        {
+            Snackbar.Add("Failed to add chapter", Severity.Error);
+        }
+    }
+
+    private async Task UpdateChapterAsync()
+    {
+        var response = await chapterClient.UpdateChapterAsync(chapter);
+        if (response.IsSuccess)
+        {
+            Snackbar.Add("Chapter updated successfully", Severity.Success);
+        }
+        else
+        {
+            Snackbar.Add("Failed to update chapter", Severity.Error);
+        }
+    }
+}

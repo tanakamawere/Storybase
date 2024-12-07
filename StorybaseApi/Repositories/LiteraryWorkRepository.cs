@@ -152,36 +152,67 @@ public class LiteraryWorkRepository : ILiteraryWorkRepository
 
     public async Task UpdateDtoAsync(LiteraryWorkDto entity)
     {
-        LiteraryWork literaryWork = await _context.LiteraryWorks.FindAsync(entity.Id);
+        LiteraryWork literaryWork = await _context.LiteraryWorks
+            .Include(lw => lw.Genres) // Include related data to avoid EF navigation issues
+            .Include(lw => lw.Chapters)
+            .FirstOrDefaultAsync(lw => lw.Id == entity.Id);
+
         if (literaryWork != null)
         {
+            // Update scalar properties
             literaryWork.Title = entity.Title;
             literaryWork.Summary = entity.Summary;
             literaryWork.CoverImageUrl = entity.CoverImageUrl;
             literaryWork.Type = entity.Type;
             literaryWork.IsFree = entity.IsFree;
             literaryWork.FreePreviewPercentage = entity.FreePreviewPercentage;
-            literaryWork.Writer = await _context.Writers.Where(x => x.User.Auth0UserId == entity.Auth0Id).FirstAsync();
-
-            // Attach existing genres to the context
-            literaryWork.Genres = [];
-            foreach (var genreDto in entity.Genres)
-            {
-                var genre = await _context.Genres
-                    .FirstOrDefaultAsync(g => g.Id == genreDto.Id);
-
-                if (genre != null)
-                {
-                    _context.Attach(genre); // Attach the existing genre
-                    literaryWork.Genres.Add(genre);
-                }
-            }
-
-            literaryWork.Chapters = entity.Chapters;
             literaryWork.ProgressiveWriting = entity.ProgressiveWriting;
             literaryWork.Completed = entity.Completed;
             literaryWork.IsDeleted = entity.IsDeleted;
+
+            // Update Writer
+            literaryWork.Writer = await _context.Writers
+                .Where(x => x.User.Auth0UserId == entity.Auth0Id)
+                .FirstAsync();
+
+            // Update Genres
+            literaryWork.Genres.Clear(); // Clear the existing genres
+            foreach (var genreDto in entity.Genres)
+            {
+                var genre = await _context.Genres.FirstOrDefaultAsync(g => g.Id == genreDto.Id);
+                if (genre != null)
+                {
+                    literaryWork.Genres.Add(genre); // Add existing genres
+                }
+            }
+
+            // Update Chapters
+            foreach (var chapterDto in entity.Chapters)
+            {
+                var existingChapter = literaryWork.Chapters
+                    .FirstOrDefault(c => c.Id == chapterDto.Id);
+
+                if (existingChapter != null)
+                {
+                    // Update existing chapter
+                    existingChapter.Title = chapterDto.Title;
+                    existingChapter.Content = chapterDto.Content;
+                    existingChapter.ChapterNumber = chapterDto.ChapterNumber;
+                }
+                else
+                {
+                    // Add new chapter if it doesn't already exist
+                    literaryWork.Chapters.Add(new Chapter
+                    {
+                        Title = chapterDto.Title,
+                        Content = chapterDto.Content,
+                        ChapterNumber = chapterDto.ChapterNumber
+                    });
+                }
+            }
+
             await _context.SaveChangesAsync();
         }
     }
+
 }

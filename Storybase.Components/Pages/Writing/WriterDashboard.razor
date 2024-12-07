@@ -21,7 +21,7 @@
             @foreach (var item in literaryWorks)
             {
                 <MudItem xs="12" sm="6" md="3">
-                    <MudCard @onclick="() => GoToDetails(item.Id)">
+                    <MudCard>
                         <MudCardMedia Image="@item.CoverImageUrl" Title="@item.Title"/>
                         <MudCardContent>
                             <MudText Typo="Typo.h5">@item.Title</MudText>
@@ -44,6 +44,9 @@
                         <MudCardActions>
                             <MudButton Href="@($"/writing/edit/{item.Id}")">
                                 Edit
+                            </MudButton>
+                            <MudButton Href="@($"/details/{item.Id}")">
+                                Details
                             </MudButton>
                             <MudButton OnClick="() => (item.IsDeleted ? ArchiveLitWork(item.Id) : UnarchiveLitWork(item.Id))">
                                 @(item.IsDeleted ? "Unarchive" : "Archive")
