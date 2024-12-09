@@ -18,11 +18,12 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 });
 builder.Services.AddScoped<ILiteraryWorkRepository, LiteraryWorkRepository>();
 builder.Services.AddScoped<IGenreRepository, GenreRepository>();
-builder.Services.AddScoped<IRepository<Chapter>, GenericRepository<Chapter>>();
-builder.Services.AddScoped<IRepository<Bookmark>, GenericRepository<Bookmark>>();
+builder.Services.AddScoped<IRepository<Chapter>, ChapterRepository>();
+builder.Services.AddScoped<IBookmarkRepository, BookmarkRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IWriterRepository, WriterRepository>();
 builder.Services.AddScoped<IRepository<ReadingProgress>, GenericRepository<ReadingProgress>>();
+builder.Services.AddScoped<ILibraryRepository, LibraryRepository>();
 builder.Services.AddScoped<IRepository<Purchase>, GenericRepository<Purchase>>();
 
 builder.Services.Configure<JsonOptions>(options => {
@@ -47,5 +48,7 @@ app.MapGenreEndpoints();
 app.MapPurchaseEndpoints();
 app.MapUserEndpoints();
 app.MapWriterEndpoints();
+app.MapBookmarkEndpoints();
+app.MapLibraryEndpoints();
 
 app.Run();

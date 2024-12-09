@@ -68,4 +68,7 @@ public class EndpointStrings
     //Genres
     public const string GetAllGenres = "api/genres";
     public const string GetGenreById = "api/genres/getgenre";
+
+    //Get library of user
+    public const string GetLibrary = "api/library";
 }

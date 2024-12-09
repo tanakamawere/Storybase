@@ -35,6 +35,7 @@ builder.Services.AddScoped<ChapterClient>();
 builder.Services.AddScoped<LiteraryWorkClient>();
 builder.Services.AddScoped<PurchaseClient>();
 builder.Services.AddScoped<ReadingProgressClient>();
+builder.Services.AddScoped<LibraryClient>();
 builder.Services.AddScoped<UserClient>();
 builder.Services.AddScoped<WriterClient>();
 builder.Services.AddScoped<GenresClient>();

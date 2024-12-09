@@ -1,6 +1,9 @@
 @page "/details/{Id:int}"
+@using Storybase.Core.DTOs
 @inject LiteraryWorkClient literaryWorkClient
+@inject BookmarkClient bookmarkClient
 @inject NavigationManager navManager
+@inject ISnackbar Snackbar
 @inject UserService userService
 @attribute [Authorize]
 
@@ -22,19 +25,39 @@
                 <MudText Typo="Typo.h4">@literaryWork.Writer.User.Name</MudText>
 
                 <MudDivider/>
+
+                <MudChipSet T="Genre">
+
+                    @foreach (var genre in literaryWork.Genres)
+                    {
+                        <MudChip Size="Size.Small" Value="@genre.Id" Text="@genre.Name">
+                            @genre.Name
+                        </MudChip>
+                    }
+                </MudChipSet>
                 <!--Buttons for actions for the literaryWork-->
                 <MudStack Row="true" Spacing="3">
                     <MudIconButton Icon="@Icons.Material.Filled.BookmarkAdd"
-                                Size="Size.Large"
-                                Ripple="true"
-                                Variant="Variant.Text"
-                                Color="Color.Secondary" />
+                    Size="Size.Large"
+                    Ripple="true"
+                    Variant="Variant.Text"
+                    Color="Color.Primary" 
+                    OnClick="AddBookmark"/>
                     <MudIconButton Icon="@Icons.Material.Filled.Share"
-                        Size="Size.Large"
-                        Ripple="true"
-                        Variant="Variant.Text"
-                        Color="Color.Secondary" />
+                    Size="Size.Large"
+                    Ripple="true"
+                    Variant="Variant.Text"
+                    Color="Color.Primary" />
+
+                    <MudButton FullWidth="true"
+                    Variant="Variant.Filled"
+                    Color="Color.Primary"
+                    Class="@(literaryWork.Type.Equals(LiteraryWorkType.Book) ? "invisible": "visible")"
+                    Ripple="true">
+                        Read
+                    </MudButton>
                 </MudStack>
+
 
                 <MudDivider />
                 <MudText Typo="Typo.body1">@literaryWork.Summary</MudText>
@@ -52,12 +75,15 @@
                         foreach (var item in literaryWork.Chapters)
                         {
                             <MudPaper Elevation="2" Class="ma-3">
-                                <MudStack AlignItems="AlignItems.Stretch">
+                                <MudStack AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween">
                                     <MudText Typo="Typo.h3">@item.ChapterNumber</MudText>
                                     <div>
                                         <MudText Typo="Typo.h6">@item.Title</MudText>
                                         <MudText Typo="Typo.body2">Uploaded on: @item.DatePosted</MudText>
                                     </div>
+                                    <MudButton Variant="Variant.Outlined" Color="Color.Primary">
+                                        Read Chapter
+                                    </MudButton>
                                 </MudStack>
                             </MudPaper>
                         }
@@ -72,7 +98,7 @@
     }
 </MudGrid>
 
-
+    
 @code {
     [Parameter]
     public int Id { get; set; }
@@ -81,10 +107,12 @@
     //If this is set to true, it means the lit work is by the current user. Show options to edit & manipulate
     bool isWritersWork = false;
     private LiteraryWork literaryWork = new LiteraryWork();
+    Snackbar snackbar;
 
     protected override async Task OnParametersSetAsync()
     {
         await base.OnParametersSetAsync();
+        Auth0UserId = await userService.GetAuth0UserIdAsync();
         await LoadliteraryWork();
     }
 
@@ -104,6 +132,25 @@
         else
         {
             //Show error message
+        }
+        isBusy = false;
+    }
+
+    private async void AddBookmark()
+    {
+        isBusy = true;
+        var response = await bookmarkClient.AddBookmarkAsync(new BookmarkDto() 
+        {
+            AuthUserId = Auth0UserId,
+            LiteraryWorkId = literaryWork.Id
+        });
+        if (response.IsSuccess)
+        {
+            snackbar = Snackbar.Add($"Added {literaryWork.Title} to your library", Severity.Normal);
+        }
+        else
+        {
+            snackbar = Snackbar.Add($"Something went wrong.", Severity.Error);
         }
         isBusy = false;
     }

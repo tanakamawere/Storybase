@@ -1,0 +1,26 @@
+﻿<MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween">
+    <div>
+        <MudText Typo="Typo.h2">
+            @Title
+        </MudText>
+        <MudText Typo="Typo.subtitle1">
+            @Subtitle
+        </MudText>
+    </div>
+
+    <!-- Right Content -->
+    <div>
+        @ChildContent
+    </div>
+</MudStack>
+
+<MudDivider Class="mt-2"/>
+
+@code {
+    [Parameter]
+    public string Title { get; set; } = "Screen";
+    [Parameter]
+    public string Subtitle { get; set; } = "Explore Storybase";
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+}

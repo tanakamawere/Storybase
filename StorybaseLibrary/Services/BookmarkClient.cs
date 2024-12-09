@@ -2,6 +2,7 @@
 using Storybase.Core;
 using Storybase.Application.Interfaces;
 using Storybase.Application.Models;
+using Storybase.Core.DTOs;
 
 namespace Storybase.Application.Services;
 
@@ -19,7 +20,7 @@ public class BookmarkClient
         return await _apiClient.GetAsync<Bookmark>($"{EndpointStrings.GetBookmarkById}?id={id}");
     }
 
-    public async Task<ApiResponse<Bookmark>> AddBookmarkAsync(Bookmark Bookmark)
+    public async Task<ApiResponse<Bookmark>> AddBookmarkAsync(BookmarkDto Bookmark)
     {
         return await _apiClient.PostAsync<Bookmark>($"{EndpointStrings.CreateBookmark}", Bookmark);
     }

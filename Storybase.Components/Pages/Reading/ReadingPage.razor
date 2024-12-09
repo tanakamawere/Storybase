@@ -1,0 +1,78 @@
+@page "/read/chapters/{id:int}"
+@inject LiteraryWorkClient literaryWorkClient
+@inject ChapterClient chapterClient
+@inject ISnackbar Snackbar
+
+<MudContainer Class="justify-center align-center" MaxWidth="MaxWidth.Medium">
+    <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween">
+
+        <img src="@chapter.LiteraryWork.CoverImageUrl" alt="@chapter.LiteraryWork.Title"
+        class="align-center justify-center"
+        style="max-width:200px; width:100%;object-fit:fill;" />
+        <div>
+            <MudText Typo="Typo.h1">
+                @chapter.LiteraryWork.Title
+            </MudText>
+            <MudText Typo="Typo.h1">
+                @chapter.LiteraryWork.Title
+            </MudText>
+            <MudText Typo="Typo.caption">
+                @chapter.LiteraryWork.CreatedOn.ToString("D") | By @chapter.LiteraryWork.Writer.UserName
+            </MudText>
+        </div>
+    </MudStack>
+
+    <MudDivider/>
+
+    <MudText Typo="Typo.body1" HtmlTag="italics">
+        @chapter.LiteraryWork.Summary
+    </MudText>
+
+    <MudDivider />
+
+    <div>
+        <MudText Typo="Typo.h3">
+            @(chapter.LiteraryWork.Type.Equals(LiteraryWorkType.Book) ? chapter.ChapterNumber : "") | @chapters[0].Title
+        </MudText>
+        <MudText Typo="Typo.caption">
+            @chapter.DatePosted
+        </MudText>
+        <MudText Typo="Typo.body1">
+            @chapters[0].Content
+        </MudText>
+    </div>
+</MudContainer>
+
+@code{
+    [Parameter]
+    public int id { get; set; } = 0;
+    bool isBusy = false;
+    Chapter chapter = new();
+    List<Chapter> chapters = new();
+    Snackbar? snackbar;
+
+    protected override Task OnInitializedAsync()
+    {
+        return base.OnInitializedAsync();
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await GetChapter();
+    }
+
+    private async Task GetChapter()
+    {
+        isBusy = true;
+        var response = await chapterClient.GetChapterByIdAsync(id);
+        if (response.IsSuccess)
+        {
+            chapter = response.Data;
+        }
+        else
+        {
+            snackbar = Snackbar.Add($"Error: {response.ErrorMessage}", Severity.Error);
+        }
+        isBusy = false;
+    }
+}

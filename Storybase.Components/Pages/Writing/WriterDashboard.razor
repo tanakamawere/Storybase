@@ -34,11 +34,11 @@
                             </MudText>
                             @foreach (var genre in item.Genres)
                             {
-                                <MudStack Row="true">
+                                <MudContainer Class="d-flex flex-row">
                                     <MudChip Size="Size.Small" Value="@genre.Id" Text="@genre.Name">
                                         @genre.Name
                                     </MudChip>
-                                </MudStack>
+                                </MudContainer>
                             }
                         </MudCardContent>
                         <MudCardActions>

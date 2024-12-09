@@ -1,7 +1,88 @@
 ﻿@page "/library"
+@using Storybase.Core.DTOs
+@inject LiteraryWorkClient literaryWorkClient
+@inject LibraryClient libraryClient
+@inject NavigationManager navManager
+@inject ISnackbar Snackbar
+@inject UserService userService
+@attribute [Authorize]
 
-<h3>Library</h3>
+
+<HeaderComponent Title="Library" Subtitle="Your bookmarks and purchases, in one place" />
+
+<!--Purchases components-->
+<div>
+    <SubheaderComponent Title="Purchases" Subtitle="The works you have boughts"/>
+
+    @if (libraryDto.Purchases.Count().Equals(0))
+    {
+        <EmptyComponent Message="You have not purchased any books, chapters or poems yet." />
+    }
+    else
+    {
+        <MudGrid>
+            @foreach (Purchase purchase in libraryDto.Purchases)
+            {
+                <MudItem xs="12" sm="6" md="3">
+                    <MudCard>
+                        <MudCardHeader>
+                            <CardHeaderAvatar>
+                                <MudAvatar Color="Color.Secondary">
+                                    I
+                                </MudAvatar>
+                            </CardHeaderAvatar>
+                            <CardHeaderContent>
+                                <MudText Typo="Typo.body1">Istra Croatia</MudText>
+                                <MudText Typo="Typo.body2">Peninsula in Europe</MudText>
+                            </CardHeaderContent>
+                            <CardHeaderActions>
+                                <MudIconButton Icon="@Icons.Material.Filled.Settings" Color="Color.Default" />
+                            </CardHeaderActions>
+                        </MudCardHeader>
+                        <MudCardMedia Image="@purchase.Chapter.LiteraryWork.CoverImageUrl" Title="@purchase.Chapter.Title" />
+                        <MudCardContent>
+                            <MudText Typo="Typo.h5">
+                                @purchase.Chapter.Title
+                            </MudText>
+                            <MudText Typo="Typo.h6">@purchase.Chapter.LiteraryWork.Writer.User.Name</MudText>
+
+                        </MudCardContent>
+                    </MudCard>
+                </MudItem>
+            }
+        </MudGrid>
+    }
+</div>
+
+<!--Bookmarks component-->
+
 
 @code {
+    private string authUserId = "";
+    bool isBusy = false;
+    LibraryDto libraryDto = new();
 
+    protected override async Task OnInitializedAsync()
+    {
+        authUserId = await userService.GetAuth0UserIdAsync();
+        await GetLibraryAsync();
+    }
+
+    private async Task GetLibraryAsync()
+    {
+        isBusy = true;
+
+        var response = await libraryClient.GetLibraryAsync(authUserId);
+
+        if (response.IsSuccess)
+        {
+            libraryDto = response.Data;
+        }
+        else
+        {
+            Snackbar.Add(response.ErrorMessage, Severity.Error);
+        }
+
+        isBusy = false;
+    }
 }
