@@ -6,6 +6,7 @@ using Storybase.Application.Interfaces;
 using Storybase.Application.Services;
 using Storybase.Blazor;
 using Storybase.Core.Models;
+using Storybase.Components.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -40,6 +41,7 @@ builder.Services.AddScoped<UserClient>();
 builder.Services.AddScoped<WriterClient>();
 builder.Services.AddScoped<GenresClient>();
 builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<DialogHelperService>();
 
 var app = builder.Build();
 

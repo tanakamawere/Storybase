@@ -2,69 +2,113 @@
 @using Storybase.Core.DTOs
 @inject LiteraryWorkClient literaryWorkClient
 @inject LibraryClient libraryClient
+@inject BookmarkClient bookmarkClient
 @inject NavigationManager navManager
 @inject ISnackbar Snackbar
+@inject DialogHelperService DialogHelperService
+@inject IDialogService DialogService
 @inject UserService userService
 @attribute [Authorize]
 
 
-<HeaderComponent Title="Library" Subtitle="Your bookmarks and purchases, in one place" />
+<MudContainer>
 
-<!--Purchases components-->
-<div>
-    <SubheaderComponent Title="Purchases" Subtitle="The works you have boughts"/>
+    <HeaderComponent Title="Library" Subtitle="Your bookmarks and purchases, in one place" />
 
-    @if (libraryDto.Purchases.Count().Equals(0))
-    {
-        <EmptyComponent Message="You have not purchased any books, chapters or poems yet." />
-    }
-    else
-    {
-        <MudGrid>
-            @foreach (Purchase purchase in libraryDto.Purchases)
-            {
-                <MudItem xs="12" sm="6" md="3">
-                    <MudCard>
-                        <MudCardHeader>
-                            <CardHeaderAvatar>
-                                <MudAvatar Color="Color.Secondary">
-                                    I
-                                </MudAvatar>
-                            </CardHeaderAvatar>
-                            <CardHeaderContent>
-                                <MudText Typo="Typo.body1">Istra Croatia</MudText>
-                                <MudText Typo="Typo.body2">Peninsula in Europe</MudText>
-                            </CardHeaderContent>
-                            <CardHeaderActions>
-                                <MudIconButton Icon="@Icons.Material.Filled.Settings" Color="Color.Default" />
-                            </CardHeaderActions>
-                        </MudCardHeader>
-                        <MudCardMedia Image="@purchase.Chapter.LiteraryWork.CoverImageUrl" Title="@purchase.Chapter.Title" />
-                        <MudCardContent>
-                            <MudText Typo="Typo.h5">
-                                @purchase.Chapter.Title
-                            </MudText>
-                            <MudText Typo="Typo.h6">@purchase.Chapter.LiteraryWork.Writer.User.Name</MudText>
+    <!--Purchases components-->
+    <div>
+        <SubheaderComponent Title="Purchases" Subtitle="The works you have boughts" />
 
-                        </MudCardContent>
-                    </MudCard>
-                </MudItem>
-            }
-        </MudGrid>
-    }
-</div>
+        @if (libraryDto.Purchases.Count().Equals(0))
+        {
+            <EmptyComponent Message="You have not purchased any books, chapters or poems yet." />
+        }
+        else
+        {
+            <MudGrid>
+                @foreach (Purchase purchase in libraryDto.Purchases)
+                {
+                    <MudItem xs="12" sm="6" md="3">
+                        <MudCard>
+                            <MudCardHeader>
+                                <CardHeaderContent>
+                                    <MudText Typo="Typo.body1">
+                                        @purchase.Chapter.Title
+                                    </MudText>
+                                    <MudText Typo="Typo.body2">
+                                        Date purchased: @purchase.PurchaseDate.ToString("f") | <em>@purchase.Chapter.LiteraryWork.Writer.User.Name</em>
+                                    </MudText>
+                                </CardHeaderContent>
+                                <CardHeaderActions>
+                                    <MudIconButton Icon="@Icons.Material.Filled.Settings" Color="Color.Default" />
+                                </CardHeaderActions>
+                            </MudCardHeader>
+                            <MudCardMedia Image="@purchase.Chapter.LiteraryWork.CoverImageUrl" Height="100" Title="@purchase.Chapter.Title" />
+                            <MudCardContent>
 
-<!--Bookmarks component-->
+                            </MudCardContent>
+                            <MudCardActions>
+                                <MudButton Href="@($"/details/{purchase.Id}")">
+                                    Details
+                                </MudButton>
+                            </MudCardActions>
+                        </MudCard>
+                    </MudItem>
+                }
+            </MudGrid>
+        }
+    </div>
 
+    <!--Bookmarks component-->
+    <div>
+        <SubheaderComponent Title="Bookmarks" Subtitle="What you have saved for later" />
+
+        @if (libraryDto.Bookmarks.Count().Equals(0))
+        {
+            <EmptyComponent Message="You have not bookmarked any books, chapters or poems yet." />
+        }
+        else
+        {
+            <MudGrid>
+                @foreach (Bookmark bookmark in libraryDto.Bookmarks)
+                {
+                    <MudItem xs="12" sm="6" md="3">
+                        <MudCard>
+                            <MudCardHeader>
+                                <CardHeaderContent>
+                                    <MudText Typo="Typo.body1">
+                                        @bookmark.LiteraryWork.Title
+                                    </MudText>
+                                    <MudText Typo="Typo.body2">
+                                        Date Added: @bookmark.DateAdded.ToString("f")
+                                    </MudText>
+                                </CardHeaderContent>
+                                <CardHeaderActions>
+                                    <MudIconButton Icon="@Icons.Material.Filled.RemoveCircleOutline" OnClick="@(() => RemoveBookmarkAsync(bookmark.Id))" Color="Color.Default" />
+                                </CardHeaderActions>
+                            </MudCardHeader>
+                            <MudCardMedia Image="@bookmark.LiteraryWork.CoverImageUrl"  Height="100" Title="@bookmark.LiteraryWork.Title" />
+                            <MudCardContent>
+
+                            </MudCardContent>
+                        </MudCard>
+                    </MudItem>
+                }
+            </MudGrid>
+        }
+    </div>
+</MudContainer>
 
 @code {
     private string authUserId = "";
     bool isBusy = false;
-    LibraryDto libraryDto = new();
+    LibraryDto libraryDto;
 
     protected override async Task OnInitializedAsync()
     {
         authUserId = await userService.GetAuth0UserIdAsync();
+        libraryDto = new LibraryDto();
+
         await GetLibraryAsync();
     }
 
@@ -85,4 +129,32 @@
 
         isBusy = false;
     }
+
+    //Method to remove a bookmark
+    private async Task RemoveBookmarkAsync(int bookmarkId)
+    {
+        isBusy = true;
+        //show confirmation dialog to confirm deletion
+
+        bool confirmed = await DialogHelperService
+            .RemoveDeleteConfirmationDialog("Do you really want to remove this bookmark?", "Confirm");
+
+        if (confirmed)
+        {
+            var response = await bookmarkClient.DeleteBookmarkAsync(bookmarkId);
+            if (response.IsSuccess)
+            {
+                await GetLibraryAsync();
+                Snackbar.Add("Bookmark removed successfully", Severity.Success);
+            }
+            else
+            {
+                Snackbar.Add(response.ErrorMessage, Severity.Error);
+            }
+        }
+
+        isBusy = false;
+    }
+
+    private void GoToDetails(int id) => navManager.NavigateTo($"/details/{id}");
 }

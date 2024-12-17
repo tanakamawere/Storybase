@@ -1,4 +1,5 @@
 ﻿using Storybase.Core.DTOs;
+using Storybase.Core.Enums;
 using Storybase.Core.Interfaces;
 using Storybase.Core.Models;
 
@@ -11,17 +12,28 @@ public class BookmarkRepository : GenericRepository<Bookmark>,IBookmarkRepositor
     {
         context = _context;
     }
-    public async Task AddBookmarkDto(BookmarkDto bookmarkDto)
+    public async Task<BookmarkStatus> AddBookmarkDto(BookmarkDto bookmarkDto)
     {
-        Bookmark bookmark = new()
+        //check if user has already bookmarked the work
+        var bookmark = await context.Bookmarks
+            .Where(b => b.User.Auth0UserId == bookmarkDto.AuthUserId && b.LiteraryWorkId == bookmarkDto.LiteraryWorkId)
+            .FirstOrDefaultAsync();
+        if (bookmark != null)
         {
-            User = await context.Users.Where(c => c.Auth0UserId == bookmarkDto.AuthUserId).FirstOrDefaultAsync(),
-            DateAdded = DateTime.Now,
-            LiteraryWork = await context.LiteraryWorks.FindAsync(bookmarkDto.LiteraryWorkId),
-        };
-
-        await context.Bookmarks.AddAsync(bookmark);
-        await context.SaveChangesAsync();
+            return BookmarkStatus.AlreadyBookmarked;
+        }
+        else
+        {
+            Bookmark newBookmark = new Bookmark
+            {
+                User = await context.Users.Where(c => c.Auth0UserId == bookmarkDto.AuthUserId).FirstOrDefaultAsync(),
+                DateAdded = DateTime.Now,
+                LiteraryWork = await context.LiteraryWorks.FindAsync(bookmarkDto.LiteraryWorkId),
+            };
+            await context.Bookmarks.AddAsync(newBookmark);
+            await context.SaveChangesAsync();
+            return BookmarkStatus.Bookmarked;
+        }
     }
 
     public async Task<IEnumerable<Bookmark>> GetByUserIdAsync(int userId)

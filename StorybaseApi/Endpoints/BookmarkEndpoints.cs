@@ -2,6 +2,7 @@
 using Storybase.Core.Models;
 using Storybase.Core;
 using Storybase.Core.DTOs;
+using Storybase.Core.Enums;
 
 namespace StorybaseApi.Endpoints;
 
@@ -21,9 +22,14 @@ public static class BookmarkEndpoints
             return TypedResults.Ok(bookmark);
         });
         //Create a new chapter
-        app.MapPost(EndpointStrings.CreateBookmark, async Task<Results<Ok<string>, BadRequest>> (IBookmarkRepository repository, BookmarkDto createBookmark) =>
+        app.MapPost(EndpointStrings.CreateBookmark, async Task<Results<Ok<string>, BadRequest<string>>> (IBookmarkRepository repository, BookmarkDto createBookmark) =>
         {
-            await repository.AddBookmarkDto(createBookmark);
+            BookmarkStatus response = await repository.AddBookmarkDto(createBookmark);
+
+            if (response == BookmarkStatus.AlreadyBookmarked)
+            {
+                return TypedResults.BadRequest("Bookmark already exists");
+            }
             return TypedResults.Ok("Bookmark created successfully");
         });
         //Update a chapter

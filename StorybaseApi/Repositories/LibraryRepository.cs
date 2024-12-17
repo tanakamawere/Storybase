@@ -13,7 +13,11 @@ public class LibraryRepository : ILibraryRepository
     public async Task<LibraryDto> LibraryDto(string authUserId)
     {
         //Get the current user's bookmarks and purchases, if any, and add them to the LibraryDto
-        var bookmarks = await context.Bookmarks.Where(b => b.User.Auth0UserId == authUserId).ToListAsync();
+        var bookmarks = await context.Bookmarks.Where(b => b.User.Auth0UserId == authUserId)
+            .AsNoTracking()
+            .Include(p => p.LiteraryWork)
+                .ThenInclude(lw => lw.Writer)
+            .ToListAsync();
         var purchases = await context.Purchases
             .AsNoTracking()
             .Include(p => p.LiteraryWork)

@@ -138,7 +138,6 @@
 
     private async void AddBookmark()
     {
-        isBusy = true;
         var response = await bookmarkClient.AddBookmarkAsync(new BookmarkDto() 
         {
             AuthUserId = Auth0UserId,
@@ -150,8 +149,7 @@
         }
         else
         {
-            snackbar = Snackbar.Add($"Something went wrong.", Severity.Error);
+            snackbar = Snackbar.Add("You have already bookmarked this", Severity.Info);
         }
-        isBusy = false;
     }
 }
