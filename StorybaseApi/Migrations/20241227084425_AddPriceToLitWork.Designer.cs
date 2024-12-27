@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using StorybaseApi.Data;
 
@@ -11,9 +12,11 @@ using StorybaseApi.Data;
 namespace StorybaseApi.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241227084425_AddPriceToLitWork")]
+    partial class AddPriceToLitWork
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -225,16 +228,25 @@ namespace StorybaseApi.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int?>("ChapterId")
+                        .HasColumnType("int");
+
                     b.Property<int?>("LiteraryWorkId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("PurchaseDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("PurchaseType")
+                        .HasColumnType("int");
+
                     b.Property<int>("UserId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ChapterId")
+                        .HasDatabaseName("IX_Purchase_ChapterId");
 
                     b.HasIndex("LiteraryWorkId")
                         .HasDatabaseName("IX_Purchase_LiteraryWorkId");
@@ -411,6 +423,10 @@ namespace StorybaseApi.Migrations
 
             modelBuilder.Entity("Storybase.Core.Models.Purchase", b =>
                 {
+                    b.HasOne("Storybase.Core.Models.Chapter", "Chapter")
+                        .WithMany()
+                        .HasForeignKey("ChapterId");
+
                     b.HasOne("Storybase.Core.Models.LiteraryWork", "LiteraryWork")
                         .WithMany()
                         .HasForeignKey("LiteraryWorkId");
@@ -420,6 +436,8 @@ namespace StorybaseApi.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
+
+                    b.Navigation("Chapter");
 
                     b.Navigation("LiteraryWork");
 

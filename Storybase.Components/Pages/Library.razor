@@ -33,22 +33,22 @@
                             <MudCardHeader>
                                 <CardHeaderContent>
                                     <MudText Typo="Typo.body1">
-                                        @purchase.Chapter.Title
+                                        @purchase.LiteraryWork.Title
                                     </MudText>
                                     <MudText Typo="Typo.body2">
-                                        Date purchased: @purchase.PurchaseDate.ToString("f") | <em>@purchase.Chapter.LiteraryWork.Writer.User.Name</em>
+                                        Date purchased: @purchase.PurchaseDate.ToString("f") | <em>@purchase.LiteraryWork.Writer.UserName</em>
                                     </MudText>
                                 </CardHeaderContent>
                                 <CardHeaderActions>
                                     <MudIconButton Icon="@Icons.Material.Filled.Settings" Color="Color.Default" />
                                 </CardHeaderActions>
                             </MudCardHeader>
-                            <MudCardMedia Image="@purchase.Chapter.LiteraryWork.CoverImageUrl" Height="100" Title="@purchase.Chapter.Title" />
+                            <MudCardMedia Image="@purchase.LiteraryWork.CoverImageUrl" Height="100" Title="@purchase.LiteraryWork.Title" />
                             <MudCardContent>
 
                             </MudCardContent>
                             <MudCardActions>
-                                <MudButton Href="@($"/details/{purchase.Id}")">
+                                <MudButton Href="@($"/details/{purchase.LiteraryWork.Id}")">
                                     Details
                                 </MudButton>
                             </MudCardActions>
@@ -89,7 +89,7 @@
                             </MudCardHeader>
                             <MudCardMedia Image="@bookmark.LiteraryWork.CoverImageUrl"  Height="100" Title="@bookmark.LiteraryWork.Title" />
                             <MudCardContent>
-                                <MudButton Href="@($"/details/{bookmark.Id}")">
+                                <MudButton Href="@($"/details/{bookmark.LiteraryWork.Id}")">
                                     Details
                                 </MudButton>
                             </MudCardContent>

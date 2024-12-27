@@ -126,6 +126,7 @@ public class LiteraryWorkRepository : ILiteraryWorkRepository
             IsFree = entity.IsFree,
             FreePreviewPercentage = entity.FreePreviewPercentage,
             Writer = await _context.Writers.Where(x => x.User.Auth0UserId == entity.Auth0Id).FirstAsync(),
+            Price = entity.Price,
             Chapters = entity.Chapters,
             ProgressiveWriting = entity.ProgressiveWriting,
             Completed = entity.Completed,
@@ -165,6 +166,7 @@ public class LiteraryWorkRepository : ILiteraryWorkRepository
             literaryWork.CoverImageUrl = entity.CoverImageUrl;
             literaryWork.Type = entity.Type;
             literaryWork.IsFree = entity.IsFree;
+            literaryWork.Price = entity.Price;
             literaryWork.FreePreviewPercentage = entity.FreePreviewPercentage;
             literaryWork.ProgressiveWriting = entity.ProgressiveWriting;
             literaryWork.Completed = entity.Completed;

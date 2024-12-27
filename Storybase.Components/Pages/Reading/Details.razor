@@ -3,6 +3,7 @@
 @inject LiteraryWorkClient literaryWorkClient
 @inject BookmarkClient bookmarkClient
 @inject NavigationManager navManager
+@inject PurchaseClient purchaseClient
 @inject ISnackbar Snackbar
 @inject UserService userService
 @attribute [Authorize]
@@ -24,7 +25,7 @@
                 <MudText Typo="Typo.h1">@literaryWork.Title</MudText>
                 <MudLink Typo="Typo.h4" Href="@($"/writer/{literaryWork.Writer.UserName}")">@literaryWork.Writer.UserName</MudLink>
 
-                <MudDivider/>
+                <MudDivider />
 
                 <MudChipSet T="Genre">
 
@@ -35,25 +36,49 @@
                         </MudChip>
                     }
                 </MudChipSet>
+
                 <!--Buttons for actions for the literaryWork-->
                 <MudStack Row="true" Spacing="3">
                     <MudIconButton Icon="@Icons.Material.Filled.BookmarkAdd"
                     Size="Size.Large"
                     Ripple="true"
                     Variant="Variant.Text"
-                    Color="Color.Primary" 
-                    OnClick="AddBookmark"/>
+                    Color="Color.Primary"
+                    OnClick="AddBookmark" />
                     <MudIconButton Icon="@Icons.Material.Filled.Share"
                     Size="Size.Large"
                     Ripple="true"
                     Variant="Variant.Text"
                     Color="Color.Primary" />
 
-                    <MudButton OnClick="@(() => Read(literaryWork.Id, "other"))" Variant="Variant.Filled" Color="Color.Primary" Class="@(literaryWork.Type.Equals(LiteraryWorkType.Book) ? "invisible": "visible")" Ripple="true">
-                        Read
-                    </MudButton>
-                </MudStack>
+                    <!-- Free or Paid Section -->
+                    @if (literaryWork.IsFree)
+                    {
+                        <MudText Typo="Typo.h6" Color="Color.Success">This work is free to read.</MudText>
 
+                        <MudButton OnClick="@(() => Read(literaryWork.Id, "other"))" Variant="Variant.Filled" Color="Color.Primary" Class="@(literaryWork.Type.Equals(LiteraryWorkType.Book) ? "invisible": "visible")" Ripple="true">
+                            Read
+                        </MudButton>
+                    }
+                    else
+                    {
+                        if (purchaseStatusDto.IsPurchased)
+                        {
+                            <MudText Typo="Typo.caption" Color="Color.Success">You purchased this literary work on @purchaseStatusDto.PurchaseDate.ToString("f")</MudText>
+
+                            <MudButton OnClick="@(() => Read(literaryWork.Id, "other"))" Variant="Variant.Filled" Color="Color.Primary" Class="@(literaryWork.Type.Equals(LiteraryWorkType.Book) ? "invisible": "visible")" Ripple="true">
+                                Read
+                            </MudButton>
+                        }
+                        else
+                        {
+                            <MudText Typo="Typo.h6" Color="Color.Error">This work is paid.</MudText>
+                            <MudButton Variant="Variant.Filled" Color="Color.Primary" Ripple="true" OnClick="PurchaseLiteraryWork">
+                                Buy for $@literaryWork.Price
+                            </MudButton>
+                        }
+                    }
+                </MudStack>
 
                 <MudDivider />
                 <MudText Typo="Typo.body1">@literaryWork.Summary</MudText>
@@ -65,7 +90,7 @@
                     <MudText Typo="Typo.h3">
                         Chapters
                     </MudText>
-                    //List of chapters
+                    <!-- List of chapters -->
                     if (literaryWork.Chapters.Count > 0)
                     {
                         foreach (var item in literaryWork.Chapters)
@@ -77,9 +102,12 @@
                                         <MudText Typo="Typo.h6">@item.Title</MudText>
                                         <MudText Typo="Typo.body2">Uploaded on: @item.DatePosted.ToString("f")</MudText>
                                     </div>
-                                    <MudButton Variant="Variant.Outlined" Color="Color.Primary" OnClick="@(() => Read(item.Id, "chapter"))">
-                                        Read Chapter
-                                    </MudButton>
+                                    @if (purchaseStatusDto.IsPurchased || literaryWork.IsFree)
+                                    {
+                                        <MudButton Variant="Variant.Outlined" Color="Color.Primary" OnClick="@(() => Read(item.Id, "chapter"))">
+                                            Read Chapter
+                                        </MudButton>
+                                    }
                                 </MudStack>
                             </MudPaper>
                         }
@@ -94,7 +122,6 @@
     }
 </MudGrid>
 
-    
 @code {
     [Parameter]
     public int Id { get; set; }
@@ -103,6 +130,7 @@
     //If this is set to true, it means the lit work is by the current user. Show options to edit & manipulate
     bool isWritersWork = false;
     private LiteraryWork literaryWork = new LiteraryWork();
+    private PurchaseStatusDto purchaseStatusDto = new();
     Snackbar snackbar;
 
     protected override async Task OnParametersSetAsync()
@@ -119,26 +147,39 @@
         if (response.IsSuccess)
         {
             literaryWork = response.Data;
-            //Check if the literary work is by the current user
-            if (literaryWork.Writer.User.Auth0UserId == await userService.GetAuth0UserIdAsync())
+
+            //Check if user has purchased this work or not
+            if (!literaryWork.IsFree)
             {
-                isWritersWork = true;
+                PurchaseLitWorkDto purchaseLitWorkDto = new PurchaseLitWorkDto()
+                    {
+                        AuthUserId = Auth0UserId,
+                        LiteraryWorkId = literaryWork.Id
+                    };
+
+                //Check if user has purchased this work
+                var purchaseResponse = await purchaseClient.GetPurchaseByAuthUserIdAndLiteraryWorkIdAsync(purchaseLitWorkDto);
+                if (purchaseResponse.IsSuccess)
+                {
+                    purchaseStatusDto = purchaseResponse.Data;
+                }
             }
         }
         else
         {
             //Show error message
+            snackbar = Snackbar.Add("Error loading literary work", Severity.Error);
         }
         isBusy = false;
     }
 
     private async void AddBookmark()
     {
-        var response = await bookmarkClient.AddBookmarkAsync(new BookmarkDto() 
-        {
-            AuthUserId = Auth0UserId,
-            LiteraryWorkId = literaryWork.Id
-        });
+        var response = await bookmarkClient.AddBookmarkAsync(new BookmarkDto()
+            {
+                AuthUserId = Auth0UserId,
+                LiteraryWorkId = literaryWork.Id
+            });
         if (response.IsSuccess)
         {
             snackbar = Snackbar.Add($"Added {literaryWork.Title} to your library", Severity.Normal);
@@ -153,5 +194,38 @@
     private void Read(int workId, string workType)
     {
         navManager.NavigateTo($"/read/{workType}/{workId}");
+    }
+
+    //Method to purchase the work
+    private async void PurchaseLiteraryWork()
+    {
+        //Purchase the work
+        PurchasesDto purchasesDto = new PurchasesDto()
+        {
+            AuthUserId = Auth0UserId,
+            LiteraryWorkId = literaryWork.Id
+        };
+
+        try
+        {
+            var response = await purchaseClient.AddPurchaseAsync(purchasesDto);
+            if (response.IsSuccess)
+            {
+                snackbar = Snackbar.Add(response.Data, Severity.Success);
+            }
+            else
+            {
+                snackbar = Snackbar.Add(response.Data, Severity.Error);
+            }
+        }
+        catch (Exception)
+        {
+            snackbar = Snackbar.Add("Error purchasing the work", Severity.Error);
+        }
+        finally
+        {
+            await LoadliteraryWork();
+            StateHasChanged();
+        }
     }
 }

@@ -9,6 +9,11 @@ public class EndpointStrings
     public const string DeletePurchase = "api/purchases/delete";
     public const string SearchPurchases = "api/purchases/search";
     public const string GetAllPurchases = "api/purchases";
+    //Get all purchases by user
+    public const string GetPurchasesByUser = "api/purchases/user";
+    //GetPurchaseByAuthUserIdAndLiteraryWorkIdAsync
+    public const string GetPurchaseByAuthUserIdAndLiteraryWorkId = "api/purchases/getbyauthlit";
+
 
     //Reading Progress Endpoints
     public const string GetReadingProgressById = "api/rdprog/get";

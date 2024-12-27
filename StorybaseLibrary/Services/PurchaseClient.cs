@@ -2,6 +2,7 @@
 using Storybase.Core;
 using Storybase.Application.Interfaces;
 using Storybase.Application.Models;
+using Storybase.Core.DTOs;
 
 namespace Storybase.Application.Services;
 
@@ -19,14 +20,14 @@ public class PurchaseClient
         return await _apiClient.GetAsync<Purchase>($"{EndpointStrings.GetPurchaseById}?id={id}");
     }
 
-    public async Task<ApiResponse<Purchase>> AddPurchaseAsync(Purchase purchase)
+    public async Task<ApiResponse<string>> AddPurchaseAsync(PurchasesDto purchase)
     {
-        return await _apiClient.PostAsync<Purchase>($"{EndpointStrings.CreatePurchase}", purchase);
+        return await _apiClient.PostAsync<string>($"{EndpointStrings.CreatePurchase}", purchase);
     }
 
-    public async Task<ApiResponse<Purchase>> DeletePurchaseAsync(int id)
+    public async Task<ApiResponse<string>> DeletePurchaseAsync(int id)
     {
-        return await _apiClient.DeleteAsync<Purchase>($"{EndpointStrings.DeletePurchase}?id={id}");
+        return await _apiClient.DeleteAsync<string>($"{EndpointStrings.DeletePurchase}?id={id}");
     }
 
     public async Task<ApiResponse<Purchase>> UpdatePurchaseAsync(Purchase purchase)
@@ -42,5 +43,15 @@ public class PurchaseClient
     public async Task<ApiResponse<IEnumerable<Purchase>>> GetPurchasesAsync()
     {
         return await _apiClient.GetAsync<IEnumerable<Purchase>>(EndpointStrings.GetAllPurchases);
+    }
+    // Get all purchases by user
+    public async Task<ApiResponse<IEnumerable<Purchase>>> GetPurchasesByUserAsync()
+    {
+        return await _apiClient.GetAsync<IEnumerable<Purchase>>(EndpointStrings.GetPurchasesByUser);
+    }
+    // Get purchase by authuserid and litwork
+    public async Task<ApiResponse<PurchaseStatusDto>> GetPurchaseByAuthUserIdAndLiteraryWorkIdAsync(PurchaseLitWorkDto purchaseLitWorkDto)
+    {
+        return await _apiClient.PostAsync<PurchaseStatusDto>($"{EndpointStrings.GetPurchaseByAuthUserIdAndLiteraryWorkId}", purchaseLitWorkDto);
     }
 }

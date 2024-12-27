@@ -21,6 +21,10 @@ public class LiteraryWork
     [Range(0, 1, ErrorMessage = "FreePreviewPercentage must be between 0 and 1.")]
     public double FreePreviewPercentage { get; set; } // For essays/poems (e.g., 0.25 = 25% free)
 
+    // Price value
+    [Column(TypeName = "decimal(18, 2)")]
+    public decimal Price { get; set; } = 0;
+
     // Relationships
     public int WriterId { get; set; }
     public Writer Writer { get; set; }

@@ -66,6 +66,8 @@
 
                     <MudStack Justify="Justify.Center" AlignItems="AlignItems.Center">
                         <MudCheckBox @bind-Value="litWorkEditorModel.LiteraryWorkDto.IsFree" Label="Is Free" />
+                        <MudTextField @bind-Value="litWorkEditorModel.LiteraryWorkDto.Price" Label="Price" Disabled="@(litWorkEditorModel.LiteraryWorkDto.IsFree)"
+                                        InputType="InputType.Number" Adornment="Adornment.Start" AdornmentText="USD" AdornmentIcon="@Icons.Material.Filled.Money"/>
                         <MudSlider Max="1" Min="0" @bind-Value="litWorkEditorModel.LiteraryWorkDto.FreePreviewPercentage"
                                    TickMarks="true" Step="0.1"
                                    Disabled="@(litWorkEditorModel.LiteraryWorkDto.IsFree ? true : false)">
@@ -133,7 +135,7 @@
             </MudGrid>
 
             <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">Submit</MudButton>
-            <MudButton ButtonType="ButtonType.Reset" Variant="Variant.Filled" Color="Color.Secondary">Cancel</MudButton>
+            <MudButton Href="/writing/dashboard" Variant="Variant.Filled" Color="Color.Secondary">Cancel</MudButton>
 
         </EditForm>
     </MudPaper>
@@ -187,6 +189,7 @@
                     Summary = literaryWork.Summary,
                     CoverImageUrl = literaryWork.CoverImageUrl,
                     Type = literaryWork.Type,
+                    Price = literaryWork.Price,
                     IsFree = literaryWork.IsFree,
                     FreePreviewPercentage = literaryWork.FreePreviewPercentage,
                     ProgressiveWriting = literaryWork.ProgressiveWriting,

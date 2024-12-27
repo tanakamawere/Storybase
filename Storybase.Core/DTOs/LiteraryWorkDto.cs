@@ -28,6 +28,8 @@ public class LiteraryWorkDto
     public bool IsFree { get; set; }
 
     [Column(TypeName = "decimal(18, 2)")]
+    public decimal Price { get; set; } = 0;
+
     [Range(0, 1, ErrorMessage = "FreePreviewPercentage must be between 0 and 1.")]
     public double FreePreviewPercentage { get; set; }
     public string Auth0Id { get; set; }

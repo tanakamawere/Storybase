@@ -58,11 +58,6 @@ namespace StorybaseApi.Data
                 .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<Purchase>()
-                .HasOne(p => p.Chapter)
-                .WithMany()
-                .HasForeignKey(p => p.ChapterId);
-
-            modelBuilder.Entity<Purchase>()
                 .HasOne(p => p.LiteraryWork)
                 .WithMany()
                 .HasForeignKey(p => p.LiteraryWorkId);
@@ -137,12 +132,7 @@ namespace StorybaseApi.Data
             modelBuilder.Entity<Purchase>()
                 .HasIndex(p => p.LiteraryWorkId)
                 .HasDatabaseName("IX_Purchase_LiteraryWorkId");
-
-            // Index on ChapterId
-            modelBuilder.Entity<Purchase>()
-                .HasIndex(p => p.ChapterId)
-                .HasDatabaseName("IX_Purchase_ChapterId");
-
+            
             // Index on frequently queried field for Chapter
             modelBuilder.Entity<Chapter>()
                 .HasIndex(c => c.BookId)
