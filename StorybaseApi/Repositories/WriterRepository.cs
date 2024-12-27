@@ -1,4 +1,5 @@
-﻿using Storybase.Core.Interfaces;
+﻿using Storybase.Core.DTOs;
+using Storybase.Core.Interfaces;
 using Storybase.Core.Models;
 
 namespace StorybaseApi.Repositories;
@@ -25,8 +26,32 @@ public class WriterRepository : GenericRepository<Writer>, IWriterRepository
         return literary;
     }
 
-    //Get literary works by auth0id for writer profile
+    public async Task<WriterProfileDto> GetWriterProfileById(int id)
+    {
+        //Get writer profile by id
+        return new WriterProfileDto
+        {
+            Writer = await _context.Writers.FindAsync(id),
+            LiteraryWorks = await _context.LiteraryWorks
+                             .Where(lw => lw.WriterId == id)
+                             .Include(n => n.Genres)
+                             .ToListAsync()
+        };
+    }
 
+    public async Task<WriterProfileDto> GetWriterProfileByUserName(string userName)
+    {
+        Writer writer = await _context.Writers.FirstOrDefaultAsync(x => x.UserName.ToLower() == userName.ToLower());
+
+        return new WriterProfileDto
+        {
+            Writer = writer,
+            LiteraryWorks = await _context.LiteraryWorks
+                             .Where(lw => lw.WriterId == writer.Id)
+                             .Include(n => n.Genres)
+                             .ToListAsync()
+        };
+    }
 
     public async Task<bool> HasWriterProfileAsync(string userId)
     {

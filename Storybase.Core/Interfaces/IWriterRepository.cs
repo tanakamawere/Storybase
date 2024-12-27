@@ -1,4 +1,5 @@
-﻿using Storybase.Core.Models;
+﻿using Storybase.Core.DTOs;
+using Storybase.Core.Models;
 
 namespace Storybase.Core.Interfaces;
 
@@ -11,4 +12,6 @@ public interface IWriterRepository : IRepository<Writer>
     Task<bool> IsUserNameTakenAsync(string userName);
     //Check if the user already has a writer profile
     Task<bool> HasWriterProfileAsync(string userId);
+    Task<WriterProfileDto> GetWriterProfileByUserName(string userName);
+    Task<WriterProfileDto> GetWriterProfileById(int id);
 }

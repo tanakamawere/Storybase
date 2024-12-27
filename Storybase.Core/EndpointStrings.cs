@@ -48,8 +48,10 @@ public class EndpointStrings
     public const string SearchWriters = "api/writers/search";
     public const string GetWriterLiteraryWorks = "api/writers/literaryworks";
     public const string GetWriterLiteraryByAuthId = "api/writers/lwbyauthid";
-    public const string IsUserNameTaken = "api/writers/username";
+    public const string IsUserNameTaken = "api/writers/isUserNameTaken";
     public const string HasWriterProfile = "api/writers/hasprofile";
+    public const string GetWriterProfileByUserName = "api/writers/username";
+    public const string GetWriterProfileById = "api/writers/id";
 
     //Literary Work Endpoints
     public const string GetAllLiteraryWorks = "api/literaryworks";

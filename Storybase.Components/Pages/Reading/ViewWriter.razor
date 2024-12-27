@@ -1,0 +1,78 @@
+﻿@page "/writer/{writer}"
+@using Storybase.Core.DTOs
+@inject WriterClient writerClient
+@inject LiteraryWorkClient litWorkClient
+@inject NavigationManager navManager
+@inject UserService userService
+@attribute [Authorize]
+
+<MudContainer>
+    <HeaderComponent Title="@($"{writerProfile.Writer.UserName}'s profile")" Subtitle="Overview of the writer's work, in one place">
+    </HeaderComponent>
+    @if (isBusy)
+    {
+        <LoadingComponent />
+    }
+    else
+    {
+        <MudContainer>
+            <MudText Typo="Typo.h2">
+                Details
+            </MudText>
+
+            <MudLink Typo="Typo.body2">
+                Contact Info: @writerProfile.Writer.ContactInfo
+            </MudLink>
+            <MudText Typo="Typo.body1">
+                Bio: @writerProfile.Writer.Bio
+            </MudText>
+            </MudContainer>
+
+        <MudDivider Class="my-4" />
+
+        <MudGrid>
+            @foreach (var item in writerProfile.LiteraryWorks)
+            {
+                <MudItem xs="12" sm="6" md="3" Class="@(isBusy ? "d-none" : "d-block")">
+                    <MudCard @onclick="() => GoToDetails(item.Id)">
+                        <MudCardMedia Image="@item.CoverImageUrl" Title="@item.Title" />
+                        <MudCardContent>
+                            <MudText Typo="Typo.h5">@item.Title</MudText>
+                        </MudCardContent>
+                    </MudCard>
+                </MudItem>
+            }
+        </MudGrid>
+    }
+</MudContainer>
+
+@code {
+    [Parameter]
+    public string writer { get; set; } = "";
+
+    private string Auth0UserId = "";
+    private WriterProfileDto writerProfile = new();
+    bool isBusy = false;
+
+    protected async override Task OnInitializedAsync()
+    {
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await GetWriterProfile();
+    }
+
+    private async Task GetWriterProfile()
+    {
+        isBusy = true;
+        var apiResponse = await writerClient.GetWriterProfileByUserNameAsync(writer);
+        if (apiResponse.IsSuccess)
+        {
+            writerProfile = apiResponse.Data;
+        }
+        isBusy = false;
+    }
+
+    private void GoToDetails(int id) => navManager.NavigateTo($"/details/{id}");
+}

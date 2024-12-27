@@ -96,6 +96,21 @@ public static class WriterEndpoints
             return TypedResults.Ok(literaryWorks);
         });
 
+        //Get writer profile by username
+        app.MapGet(EndpointStrings.GetWriterProfileByUserName, async Task<Results<Ok<WriterProfileDto>, BadRequest>> (IWriterRepository repository, string userName) =>
+        {
+            var writerProfile = await repository.GetWriterProfileByUserName(userName);
+            return TypedResults.Ok(writerProfile);
+        });
+
+        //get writer profile by id
+        app.MapGet(EndpointStrings.GetWriterProfileById, async Task<Results<Ok<WriterProfileDto>, BadRequest>> (IWriterRepository repository, int id) =>
+        {
+            var writerProfile = await repository.GetWriterProfileById(id);
+            return TypedResults.Ok(writerProfile);
+        });
+
+
         return app;
     }
 }

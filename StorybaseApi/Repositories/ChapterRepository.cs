@@ -35,7 +35,7 @@ public class ChapterRepository : IRepository<Chapter>
 
     public async Task<Chapter> GetByIdAsync(int id)
     {
-        return await context.Chapters.Include(m => m.LiteraryWork)
+        return await context.Chapters.Include(m => m.LiteraryWork).ThenInclude(m => m.Writer)
             .FirstAsync(c => c.Id == id);
     }
 

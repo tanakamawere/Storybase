@@ -1,64 +1,131 @@
-@page "/read/chapters/{id:int}"
+@page "/read/{type}/{id:int}"
 @inject LiteraryWorkClient literaryWorkClient
 @inject ChapterClient chapterClient
 @inject ISnackbar Snackbar
 
-<MudContainer Class="justify-center align-center" MaxWidth="MaxWidth.Medium">
-    <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween">
+<MudContainer Class="justify-center align-center mt-3" MaxWidth="MaxWidth.Medium">
 
-        <img src="@chapter.LiteraryWork.CoverImageUrl" alt="@chapter.LiteraryWork.Title"
-        class="align-center justify-center"
-        style="max-width:200px; width:100%;object-fit:fill;" />
-        <div>
-            <MudText Typo="Typo.h1">
-                @chapter.LiteraryWork.Title
-            </MudText>
-            <MudText Typo="Typo.h1">
-                @chapter.LiteraryWork.Title
-            </MudText>
-            <MudText Typo="Typo.caption">
-                @chapter.LiteraryWork.CreatedOn.ToString("D") | By @chapter.LiteraryWork.Writer.UserName
-            </MudText>
-        </div>
-    </MudStack>
+    @if (isBusy)
+    {
+        <LoadingComponent Message="Getting the content" />
+    }
+    else
+    {
+        @if (type.Equals("other"))
+        {
+            <!--Content page for the poems-->
+            <MudGrid>
+                <MudItem xs="12" sm="6" Class="d-flex align-center justify-center">
+                    <img src="@literaryWork.CoverImageUrl" alt="@literaryWork.Title"
+                         class="align-center justify-center"
+                         style="max-width:300px; width:100%;object-fit:fill;" />
+                </MudItem>
+                <MudItem Class="justify-center align-center" xs="12" sm="6">
+                    <MudText Typo="Typo.h1">@literaryWork.Title</MudText>
+                    <MudLink Typo="Typo.h3" Href="@($"/writer/{literaryWork.Writer.UserName}")">
+                        <small>By: </small>@literaryWork.Writer.UserName
+                    </MudLink>
+                    <MudText Typo="Typo.h6">
+                        Uploaded: @literaryWork.CreatedOn.ToString("f")
+                    </MudText>
+                </MudItem>
+            </MudGrid>
 
-    <MudDivider/>
+            <MudDivider Class="my-6" />
 
-    <MudText Typo="Typo.body1" HtmlTag="italics">
-        @chapter.LiteraryWork.Summary
-    </MudText>
 
-    <MudDivider />
+            <MudContainer MaxWidth="MaxWidth.Small">
+                <MudText Typo="Typo.h6">
+                    @literaryWork.Type
+                </MudText>
+                <MudText Typo="Typo.body1" HtmlTag="italics">
+                    @literaryWork.Summary
+                </MudText>
 
-    <div>
-        <MudText Typo="Typo.h3">
-            @(chapter.LiteraryWork.Type.Equals(LiteraryWorkType.Book) ? chapter.ChapterNumber : "") | @chapters[0].Title
-        </MudText>
-        <MudText Typo="Typo.caption">
-            @chapter.DatePosted
-        </MudText>
-        <MudText Typo="Typo.body1">
-            @chapters[0].Content
-        </MudText>
-    </div>
+                <MudDivider Class="my-6" />
+
+                @if (chapters != null && chapters.Count > 0)
+                {
+                    <MudText Typo="Typo.body1">@chapters[0].Content</MudText>
+                }
+                else
+                {
+                    <MudText Typo="Typo.body1">No chapters available.</MudText>
+                }
+            </MudContainer>
+        }
+        else
+        {
+            if (chapter != null)
+            {
+                <MudText Typo="Typo.h1">@chapter.Title</MudText>
+                <MudText Typo="Typo.h2">
+                    <small>Chapter from the book:</small> @chapter.LiteraryWork.Title
+                </MudText>
+
+                <MudDivider Class="my-3" />
+
+                <MudLink Typo="Typo.h4" Href="@($"/writer/{chapter.LiteraryWork.Writer.UserName}")">
+                    <small>By: </small>@chapter.LiteraryWork.Writer.UserName
+                </MudLink>
+                <MudText Typo="Typo.h6">
+                    Uploaded: @chapter.LiteraryWork.CreatedOn.ToString("f")
+                </MudText>
+                <MudText Typo="Typo.h6">
+                    @chapter.LiteraryWork.Type
+                </MudText>
+
+                <MudDivider Class="my-6" />
+
+                <MudText Typo="Typo.body1">@chapter.Content</MudText>
+            }
+        }
+    }
+    
 </MudContainer>
 
 @code{
     [Parameter]
     public int id { get; set; } = 0;
+    //Determines the literature work type so as to know which client to use
+    [Parameter]
+    public string type { get; set; } = "chapter";
     bool isBusy = false;
-    Chapter chapter = new();
+    private Chapter chapter = new Chapter();
     List<Chapter> chapters = new();
+    LiteraryWork literaryWork = new LiteraryWork();
     Snackbar? snackbar;
 
-    protected override Task OnInitializedAsync()
+    protected override async Task OnInitializedAsync()
     {
-        return base.OnInitializedAsync();
     }
 
     protected override async Task OnParametersSetAsync()
     {
-        await GetChapter();
+        if (type.Equals("other"))
+        {
+            await GetLiteraryWork();
+        }
+        else
+        {
+            await GetChapter();
+        }
+    }
+
+    private async Task GetLiteraryWork()
+    {
+        isBusy = true;
+        var response = await literaryWorkClient.GetLiteraryWorkByIdAsync(id);
+        if (response.IsSuccess)
+        {
+            literaryWork = response.Data;
+            chapters = literaryWork.Chapters.ToList();
+        }
+        else
+        {
+            snackbar = Snackbar.Add($"Error: {response.ErrorMessage}", Severity.Error);
+        }
+        isBusy = false;
     }
 
     private async Task GetChapter()

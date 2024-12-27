@@ -19,9 +19,9 @@ namespace Storybase.Application.Services
             return await _apiClient.GetAsync<Chapter>($"{EndpointStrings.GetChapterById}?id={id}");
         }
 
-        public async Task<ApiResponse<Chapter>> AddChapterAsync(Chapter chapter)
+        public async Task<ApiResponse<string>> AddChapterAsync(Chapter chapter)
         {
-            return await _apiClient.PostAsync<Chapter>($"{EndpointStrings.CreateChapter}", chapter);
+            return await _apiClient.PostAsync<string>($"{EndpointStrings.CreateChapter}", chapter);
         }
 
         public async Task<ApiResponse<string>> DeleteChapterAsync(int id)

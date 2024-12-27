@@ -89,7 +89,9 @@
                             </MudCardHeader>
                             <MudCardMedia Image="@bookmark.LiteraryWork.CoverImageUrl"  Height="100" Title="@bookmark.LiteraryWork.Title" />
                             <MudCardContent>
-
+                                <MudButton Href="@($"/details/{bookmark.Id}")">
+                                    Details
+                                </MudButton>
                             </MudCardContent>
                         </MudCard>
                     </MudItem>

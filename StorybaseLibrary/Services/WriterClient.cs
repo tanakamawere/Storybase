@@ -59,4 +59,15 @@ public class WriterClient
     {
         return await _apiClient.GetAsync<IEnumerable<LiteraryWork>>($"{EndpointStrings.GetWriterLiteraryByAuthId}?auth0id={auth0id}");
     }
+
+    //Get writer profile by username
+    public async Task<ApiResponse<WriterProfileDto>> GetWriterProfileByUserNameAsync(string userName)
+    {
+        return await _apiClient.GetAsync<WriterProfileDto>($"{EndpointStrings.GetWriterProfileByUserName}?userName={userName}");
+    }
+    //get by id
+    public async Task<ApiResponse<WriterProfileDto>> GetWriterProfileByIdAsync(int id)
+    {
+        return await _apiClient.GetAsync<WriterProfileDto>($"{EndpointStrings.GetWriterProfileById}?id={id}");
+    }
 }
