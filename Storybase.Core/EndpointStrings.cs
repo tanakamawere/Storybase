@@ -78,4 +78,8 @@ public class EndpointStrings
 
     //Get library of user
     public const string GetLibrary = "api/library";
+    //Payment endpoints
+    public const string InitializePayment = "api/payments/init";
+    public const string CheckPaymentStatus = "api/payments/check";
+    public const string InitializeMobilePayment = "api/payments/initmobile";
 }

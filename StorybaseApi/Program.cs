@@ -3,6 +3,7 @@ using Storybase.Core.Interfaces;
 using Storybase.Core.Models;
 using StorybaseApi.Endpoints;
 using StorybaseApi.Repositories;
+using StorybaseApi.Services;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -25,6 +26,7 @@ builder.Services.AddScoped<IWriterRepository, WriterRepository>();
 builder.Services.AddScoped<IRepository<ReadingProgress>, GenericRepository<ReadingProgress>>();
 builder.Services.AddScoped<ILibraryRepository, LibraryRepository>();
 builder.Services.AddScoped<IPurchaseRepository, PurchasesRepository>();
+builder.Services.AddScoped<PayNowService>();
 
 builder.Services.Configure<JsonOptions>(options => {
     options.SerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
@@ -50,5 +52,6 @@ app.MapUserEndpoints();
 app.MapWriterEndpoints();
 app.MapBookmarkEndpoints();
 app.MapLibraryEndpoints();
+app.MapPaynowEndpoints();
 
 app.Run();

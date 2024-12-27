@@ -11,6 +11,7 @@ namespace StorybaseApi.Data
         public DbSet<Genre> Genres { get; set; }
         public DbSet<LiteraryWork> LiteraryWorks { get; set; }
         public DbSet<Purchase> Purchases { get; set; }
+        public DbSet<Payments> Payments { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<ReadingProgress> ReadingProgress { get; set; }
 
