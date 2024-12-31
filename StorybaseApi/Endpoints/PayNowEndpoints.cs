@@ -1,5 +1,8 @@
 ﻿using Storybase.Core;
 using Storybase.Core.DTOs;
+using Storybase.Core.Interfaces;
+using Storybase.Core.Models;
+using StorybaseApi.Repositories;
 using StorybaseApi.Services;
 using System.Security.Cryptography;
 using System.Text;
@@ -30,53 +33,34 @@ public static class PayNowEndpoints
             return TypedResults.Ok(response);
         });
 
-        app.MapPost("/api/payment/result", async (HttpRequest request) =>
+        app.MapPost(EndpointStrings.ResultUrlPaynow, async (IPaymentsRepository payments, PayNowService payNowService, HttpRequest request) =>
         {
             var form = await request.ReadFormAsync();
 
             // Extract form values
             var reference = form["reference"].ToString();
+            var paynowReference = form["paynowreference"].ToString();
             var status = form["status"].ToString();
             var amount = form["amount"].ToString();
+            var pollurl = form["pollurl"].ToString();
             var receivedHash = form["hash"].ToString();
 
-            // Validate hash
-            var expectedHash = ComputeHash(reference, status, amount, "YourIntegrationKey");
-            if (receivedHash != expectedHash)
+            // Update payment & purchase if paid
+            if (status.ToLower().Equals("paid"))
             {
-                return Results.BadRequest("Invalid hash.");
-            }
-
-            // Process payment status
-            if (status == "Paid")
-            {
-                // Update order status in your database
-                await UpdateOrderStatus(reference, "Paid");
+                await payNowService.AddPurchaseAndPayment(pollurl, reference, paynowReference);
             }
             else
             {
-                // Handle other statuses (e.g., "Cancelled", "Failed")
-                await UpdateOrderStatus(reference, status);
+                // Log failed payment
+                var payment = await payments.GetPaymentByPollLink(pollurl);
+                payment.PaymentStatus = PaymentStatus.Failed;
+                payment.Reference = "Payment failed";
+                await payments.UpdateAsync(payment);
             }
 
             return Results.Ok();
         });
-
-        // Helper method to compute hash
-        string ComputeHash(string reference, string status, string amount, string integrationKey)
-        {
-            var data = $"{reference}{status}{amount}";
-            using var hmac = new HMACSHA256(Encoding.UTF8.GetBytes(integrationKey));
-            return BitConverter.ToString(hmac.ComputeHash(Encoding.UTF8.GetBytes(data))).Replace("-", "").ToLower();
-        }
-
-        // Placeholder for updating the order status in the database
-        async Task UpdateOrderStatus(string reference, string status)
-        {
-            // Simulate database update
-            Console.WriteLine($"Order {reference} updated to status: {status}");
-            await Task.CompletedTask;
-        }
 
         return app;
     }

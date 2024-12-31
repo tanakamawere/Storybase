@@ -86,4 +86,5 @@ public class EndpointStrings
     //Payments endpoints
     public const string GetPaymentById = "api/payments/getpayment";
     public const string GetPaymentByTransactionId = "api/payments/getbytransactionid";
+    public const string ResultUrlPaynow = "/api/payment/result";
 }

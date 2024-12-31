@@ -149,6 +149,13 @@ public class AppDbContext : DbContext
             .HasDatabaseName("IX_Payments_TransactionId")
             .IsUnique();
         modelBuilder.Entity<Payments>()
+            .HasIndex(p => p.PollUrl)
+            .HasDatabaseName("IX_Payments_PollUrl");
+        //Indexing by paynow reference
+        modelBuilder.Entity<Payments>()
+            .HasIndex(p => p.PayNowReference)
+            .HasDatabaseName("IX_Payments_PaynowReference");
+        modelBuilder.Entity<Payments>()
             .HasIndex(p => p.UserId)
             .HasDatabaseName("IX_Payments_UserId");
         modelBuilder.Entity<Payments>()

@@ -1,4 +1,5 @@
-﻿using Storybase.Core.DTOs;
+﻿using Azure;
+using Storybase.Core.DTOs;
 using Storybase.Core.Interfaces;
 using Storybase.Core.Models;
 using Webdev.Payments;
@@ -107,21 +108,18 @@ public class PayNowService
 
             if (response.WasPaid)
             {
-                //Update the payment in the database
+                //First check in the database if the payment has already been paid through the result url
                 var payment = await paymentsRepository.GetPaymentByPollLink(pollUrl);
-                payment.PaymentStatus = PaymentStatus.Paid;
-                payment.UpdatedAt = DateTime.Now;
-                payment.Reference = response.Reference;
-                await paymentsRepository.UpdateAsync(payment);
-
-                //Add the purchased literary work to the user's account
-                var purchase = new PurchasesDto
+                if (payment.PaymentStatus == PaymentStatus.Paid)
                 {
-                    UserId = payment.UserId,
-                    LiteraryWorkId = int.Parse(payment.Title),
-                    PurchaseDate = DateTime.Now
-                };
-                await purchaseRepository.AddPurchaseAfterPayment(purchase);
+                    paymentCheckResponse.IsSuccess = true;
+                    paymentCheckResponse.WasPaid = true;
+                    paymentCheckResponse.Errors = "Payment already made";
+                }
+                else
+                {
+                    await AddPurchaseAndPayment(pollUrl, paymentCheckResponse.Reference);
+                }
             }
             else
             {
@@ -170,6 +168,27 @@ public class PayNowService
             paymentResponse.IsSuccess = false;
         }
         return paymentResponse;
+    }
+
+    //Method to add purchase and update payment to the database
+    public async Task AddPurchaseAndPayment(string pollUrl, string reference, string payNowReference = "")
+    {
+        //Update the payment in the database
+        var payment = await paymentsRepository.GetPaymentByPollLink(pollUrl);
+        payment.PaymentStatus = PaymentStatus.Paid;
+        payment.UpdatedAt = DateTime.Now;
+        payment.Reference = reference;
+        payment.PayNowReference = payNowReference; 
+        await paymentsRepository.UpdateAsync(payment);
+
+        //Add the purchased literary work to the user's account
+        var purchase = new PurchasesDto
+        {
+            UserId = payment.UserId,
+            LiteraryWorkId = int.Parse(payment.Title),
+            PurchaseDate = DateTime.Now
+        };
+        await purchaseRepository.AddPurchaseAfterPayment(purchase);
     }
 }
 

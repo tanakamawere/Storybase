@@ -22,6 +22,7 @@ public class Payments
     public DateTime CreatedAt { get; set; }
     public DateTime? UpdatedAt { get; set; }
     public Guid? TransactionId { get; set; }
+    public string PayNowReference { get; set; } = "";
 }
 
 public enum PaymentStatus
