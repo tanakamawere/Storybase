@@ -16,6 +16,12 @@ public class UserRepository : GenericRepository<User>, IUserRepository
         return await _context.Users.FirstOrDefaultAsync(x => x.Auth0UserId == auth0UserId);
     }
 
+    public async Task<string> GetUserId(string auth0UserId)
+    {
+        var user = await _context.Users.FirstOrDefaultAsync(x => x.Auth0UserId == auth0UserId);
+        return user.Id.ToString();
+    }
+
     public async Task<bool> IsEmailTakenAsync(string email)
     {
         return await _context.Users.AnyAsync(x => x.Email == email);

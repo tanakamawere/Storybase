@@ -7,6 +7,7 @@ public class Payments
 {
     [Key]
     public int Id { get; set; }
+    public string Title { get; set; }
 
     [Required]
     public string UserId { get; set; }
@@ -14,14 +15,18 @@ public class Payments
     [Required]
     [Column(TypeName = "decimal(18, 2)")]
     public decimal Amount { get; set; }
+    public string PollUrl { get; set; }
+    public string Reference { get; set; }
+    public PaymentStatus PaymentStatus { get; set; }
 
-    [Required]
-    public string Currency { get; set; } = "USD";
+    public DateTime CreatedAt { get; set; }
+    public DateTime? UpdatedAt { get; set; }
+}
 
-    [Required]
-    public DateTime PaymentDate { get; set; } = DateTime.Now;
-
-    public string TransactionId { get; set; }
-
-    public string Description { get; set; }
+public enum PaymentStatus
+{
+    Pending,
+    Paid,
+    Failed,
+    NotPaid
 }

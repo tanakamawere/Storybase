@@ -2,6 +2,8 @@
 
 public class PurchasesDto
 {
+    //Used to log the purchase after payment
+    public string UserId { get; set; } = "";
     public string AuthUserId { get; set; }
 
     // For LiteraryWork Purchases

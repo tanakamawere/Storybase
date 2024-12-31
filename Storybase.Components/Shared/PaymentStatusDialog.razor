@@ -1,0 +1,97 @@
+﻿@using Storybase.Core.DTOs
+@inject NavigationManager navManager
+@inject PayNowClient payNowClient
+@inject ISnackbar Snackbar
+
+<MudDialog>
+    <DialogContent>
+        <!--content showing loading bar and button to check for payment status-->
+        @if (!paymentCheckResponseDto.IsSuccess)
+        {
+            <MudStack Justify="Justify.Center">
+                <MudProgressCircular Indeterminate="true" Size="Size.Large" />
+                <MudButton Variant="Variant.Filled" Color="Color.Primary"
+                OnClick="CheckPaymentStatus">Check Payment Status</MudButton>
+                <!--Button to talk to help through whatsapp-->
+                <MudButton Variant="Variant.Filled" Color="Color.Secondary"
+                           StartIcon="@Icons.Material.Filled.Help"
+                           Class="@(buttonPress.Equals(0) ? "invisible": "visible")"
+                           OnClick="OpenHelp">
+                    Talk to Support
+                </MudButton>
+                <MudButton Variant="Variant.Filled" Color="Color.Secondary"
+                           StartIcon="@Icons.Material.Filled.Close"
+                           Class="@(buttonPress.Equals(0) ? "invisible": "visible")"
+                           OnClick="Cancel">
+                    Close
+                </MudButton>
+
+            </MudStack>
+        }
+        else
+        {
+            <MudStack Justify="Justify.Center">
+                <MudIcon Icon="@Icons.Material.Filled.DoneAll" Title="Done Icon"
+                Color="Color.Success"/>
+
+                <MudText Typo="Typo.h2">
+                    Payment Successful
+                </MudText>
+                <MudText Typo="Typo.h6">
+                    Ref: @paymentCheckResponseDto.Reference <br />
+                    Thank you for supporting Storybase and it's writers.
+                </MudText>
+            </MudStack>
+        }
+    </DialogContent>
+</MudDialog>
+
+@code {
+    [CascadingParameter]
+    private MudDialogInstance MudDialog { get; set; }
+    [Parameter]
+    public string PollLink { get; set; }
+    private PaymentCheckResponseDto paymentCheckResponseDto = new();
+    Snackbar snackbar;
+    private int buttonPress = 0;
+
+    protected async override Task OnParametersSetAsync()
+    {
+        //open the poll link
+        if (!string.IsNullOrEmpty(PollLink))
+        {
+            navManager.NavigateTo(PollLink);
+        }
+    }
+
+    //Check the payment status
+    private async Task CheckPaymentStatus()
+    {
+        var response = await payNowClient.CheckPaymentStatusAsync(PollLink);
+        if (response.IsSuccess)
+        {
+            paymentCheckResponseDto = response.Data;
+
+            //If true, payment was successful
+            MudDialog.Close(DialogResult.Ok(true));
+        }
+        else
+        {
+            //Snackbar informing the user to confirm if payment was successful
+            snackbar = Snackbar.Add("Please confirm if you have paid successfully.", Severity.Info);
+            buttonPress++;
+        }
+        StateHasChanged();
+    }
+
+    //Method to open whatsapp support with reference of the transaction
+    private void OpenHelp()
+    {
+        navManager.NavigateTo($"https://wa.me/263777777777?text=Hello, I need help with my payment. My reference is {paymentCheckResponseDto.Reference}");
+    }
+
+    private void Cancel()
+    {
+        MudDialog.Cancel();
+    }
+}

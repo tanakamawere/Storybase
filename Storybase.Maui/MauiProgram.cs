@@ -1,6 +1,8 @@
 ﻿using Microsoft.Extensions.Logging;
 using MudBlazor.Services;
+using Storybase.Application.Interfaces;
 using Storybase.Application.Services;
+using Storybase.Components.Services;
 
 namespace Storybase.Maui
 {
@@ -16,8 +18,8 @@ namespace Storybase.Maui
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                 });
             builder.Services.AddMudServices();
-            builder.Services.AddHttpClient("StorybaseApiClient", client =>
-            client.BaseAddress = new Uri("https://ndhwhzs1-7199.inc1.devtunnels.ms/"));
+            builder.Services.AddHttpClient<IApiClient, ApiClient>("StorybaseApiClient", client =>
+            client.BaseAddress = new Uri("https://318c-77-246-55-166.ngrok-free.app/"));
 
             builder.Services.AddMauiBlazorWebView();
 
@@ -27,8 +29,13 @@ namespace Storybase.Maui
             builder.Services.AddScoped<LiteraryWorkClient>();
             builder.Services.AddScoped<PurchaseClient>();
             builder.Services.AddScoped<ReadingProgressClient>();
+            builder.Services.AddScoped<LibraryClient>();
             builder.Services.AddScoped<UserClient>();
             builder.Services.AddScoped<WriterClient>();
+            builder.Services.AddScoped<GenresClient>();
+            builder.Services.AddScoped<UserService>();
+            builder.Services.AddScoped<DialogHelperService>();
+            builder.Services.AddScoped<PayNowClient>();
 
 #if DEBUG
             builder.Services.AddBlazorWebViewDeveloperTools();

@@ -8,4 +8,5 @@ public interface IUserRepository : IRepository<User>
     Task<User> GetByAuth0UserIdAsync(string auth0UserId);
     // Check if email is taken
     Task<bool> IsEmailTakenAsync(string email);
+    Task<string> GetUserId(string auth0UserId);
 }

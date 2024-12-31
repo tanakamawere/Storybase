@@ -24,6 +24,7 @@ builder.Services.AddScoped<IBookmarkRepository, BookmarkRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IWriterRepository, WriterRepository>();
 builder.Services.AddScoped<IRepository<ReadingProgress>, GenericRepository<ReadingProgress>>();
+builder.Services.AddScoped<IPaymentsRepository, PaymentsRepository>();
 builder.Services.AddScoped<ILibraryRepository, LibraryRepository>();
 builder.Services.AddScoped<IPurchaseRepository, PurchasesRepository>();
 builder.Services.AddScoped<PayNowService>();

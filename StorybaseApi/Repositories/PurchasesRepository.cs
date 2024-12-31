@@ -56,5 +56,19 @@ namespace StorybaseApi.Repositories
             await context.AddAsync(purchase);
             await context.SaveChangesAsync();
         }
+
+        public async Task AddPurchaseAfterPayment(PurchasesDto entity)
+        {
+            var purchase = new Purchase
+            {
+                User = await context.Users.FindAsync(entity.UserId),
+                LiteraryWorkId = entity.LiteraryWorkId,
+                LiteraryWork = await context.LiteraryWorks.FirstOrDefaultAsync(lw => lw.Id == entity.LiteraryWorkId),
+                PurchaseDate = DateTime.Now
+            };
+
+            await context.AddAsync(purchase);
+            await context.SaveChangesAsync();
+        }
     }
 }

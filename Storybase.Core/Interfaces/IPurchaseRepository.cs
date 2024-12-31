@@ -8,4 +8,5 @@ public interface IPurchaseRepository : IRepository<Purchase>
     public Task<IEnumerable<Purchase>> GetPurchasesByUser();
     public Task<PurchaseStatusDto> GetIfPurchaseByAuthUserIdAndLiteraryWorkIdAsync(PurchaseLitWorkDto purchaseLitWorkDto);
     public Task AddPurchaseDtoAsync(PurchasesDto entity);
+    public Task AddPurchaseAfterPayment(PurchasesDto entity);
 }

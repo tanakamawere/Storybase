@@ -13,7 +13,7 @@ public class PayNowClient
         apiClient = api;
     }
 
-    public async Task<ApiResponse<PaymentInitResponseDto>> InitializePaymentAsync(PaymentRequestDto paymentRequest)
+    public async Task<ApiResponse<PaymentInitResponseDto>> InitiatePaymentAsync(PaymentRequestDto paymentRequest)
     {
         return await apiClient.PostAsync<PaymentInitResponseDto>(EndpointStrings.InitializePayment, paymentRequest);
     }

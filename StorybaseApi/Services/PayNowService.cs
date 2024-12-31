@@ -1,4 +1,6 @@
 ﻿using Storybase.Core.DTOs;
+using Storybase.Core.Interfaces;
+using Storybase.Core.Models;
 using Webdev.Payments;
 
 namespace StorybaseApi.Services;
@@ -7,16 +9,26 @@ public class PayNowService
 {
     private readonly IConfiguration _configuration;
     private PaymentInitResponseDto paymentResponse;
+    private IPurchaseRepository purchaseRepository;
+    private IPaymentsRepository paymentsRepository;
+    private IUserRepository userRepository;
 
-    public PayNowService(IConfiguration configuration)
+    public PayNowService(IConfiguration configuration, 
+            IPurchaseRepository _purchaseRepository, 
+            IPaymentsRepository _payments,
+            IUserRepository _userRepository)
     {
         _configuration = configuration;
         paymentResponse = new();
+        purchaseRepository = _purchaseRepository;
+        paymentsRepository = _payments;
+        userRepository = _userRepository;
     }
 
     public async Task<PaymentInitResponseDto> InitializePayment(PaymentRequestDto paymentRequest)
     {
         // Fetch credentials from config
+        //TODO: Log purchases and payments after successful payment on the server
         var integrationId = _configuration["PayNow:IntegrationId"];
         var integrationKey = _configuration["PayNow:IntegrationKey"];
         var returnUrl = _configuration["PayNow:ReturnUrl"];
@@ -35,6 +47,19 @@ public class PayNowService
         // Send payment to PayNow
         var response = await paynow.SendAsync(payment);
 
+        //So once a payment is initiated, log the payment details to the database
+        Payments payments = new Payments
+        {
+            UserId = await userRepository.GetUserId(paymentRequest.UserAuthId),
+            Title = paymentRequest.LiteraryWorkPurchasedId.ToString(),
+            Amount = paymentRequest.Amount,
+            PaymentStatus = PaymentStatus.Pending,
+            CreatedAt = DateTime.Now,
+            UpdatedAt = DateTime.Now,
+            PollUrl = response.PollUrl(),
+            Reference = $"{DateTime.Now}: {paymentRequest.LiteraryWorkPurchasedId}"
+        };
+
         if (response.Success())
         {
             // Get the url to redirect the user to so they can make payment
@@ -47,7 +72,13 @@ public class PayNowService
         else
         {
             paymentResponse.IsSuccess = false;
+            payments.PaymentStatus = PaymentStatus.Failed;
+            //Reference holds the errors that occurred during the transaction
+            payments.Reference = response.Errors();
         }
+        //Save the payment details to the database
+        await paymentsRepository.AddAsync(payments);
+
         return paymentResponse;
     }
 
@@ -68,10 +99,47 @@ public class PayNowService
             paymentCheckResponse.Amount = response.Amount;
             paymentCheckResponse.Reference = response.Reference;
             paymentCheckResponse.PollUrl = response.PollUrl();
+            paymentCheckResponse.WasPaid = response.WasPaid;
+
+            if (response.WasPaid)
+            {
+                //Update the payment in the database
+                var payment = await paymentsRepository.GetPaymentByPollLink(pollUrl);
+                payment.PaymentStatus = PaymentStatus.Paid;
+                payment.UpdatedAt = DateTime.Now;
+                payment.Reference = response.Reference;
+                await paymentsRepository.UpdateAsync(payment);
+
+                //Add the purchased literary work to the user's account
+                var purchase = new PurchasesDto
+                {
+                    UserId = payment.UserId,
+                    LiteraryWorkId = int.Parse(payment.Title),
+                    PurchaseDate = DateTime.Now
+                };
+                await purchaseRepository.AddPurchaseAfterPayment(purchase);
+            }
+            else
+            {
+                //Update payment status to not paid
+                var payment = await paymentsRepository.GetPaymentByPollLink(pollUrl);
+                payment.PaymentStatus = PaymentStatus.NotPaid;
+                payment.UpdatedAt = DateTime.Now;
+                payment.Reference = response.Errors();
+                await paymentsRepository.UpdateAsync(payment);
+            }
         }
         else
         {
+            //Update payment status to failed
+            var payment = await paymentsRepository.GetPaymentByPollLink(pollUrl);
+            payment.PaymentStatus = PaymentStatus.Failed;
+            payment.UpdatedAt = DateTime.Now;
+            payment.Reference = response.Errors();
+            await paymentsRepository.UpdateAsync(payment);
+
             paymentCheckResponse.IsSuccess = false;
+            paymentCheckResponse.WasPaid = response.WasPaid;
             paymentCheckResponse.Errors = response.Errors();
         }
 

@@ -4,8 +4,10 @@
 @inject BookmarkClient bookmarkClient
 @inject NavigationManager navManager
 @inject PurchaseClient purchaseClient
+@inject PayNowClient paynowClient
 @inject ISnackbar Snackbar
 @inject UserService userService
+@inject IDialogService DialogService
 @attribute [Authorize]
 
 <MudGrid Spacing="2" style="padding:20px">
@@ -131,6 +133,7 @@
     bool isWritersWork = false;
     private LiteraryWork literaryWork = new LiteraryWork();
     private PurchaseStatusDto purchaseStatusDto = new();
+    private PaymentInitResponseDto paymentInitResponseDto = new();
     Snackbar snackbar;
 
     protected override async Task OnParametersSetAsync()
@@ -199,33 +202,59 @@
     //Method to purchase the work
     private async void PurchaseLiteraryWork()
     {
-        //Purchase the work
-        PurchasesDto purchasesDto = new PurchasesDto()
+        PaymentRequestDto paymentRequestDto = new PaymentRequestDto()
         {
-            AuthUserId = Auth0UserId,
-            LiteraryWorkId = literaryWork.Id
+            Amount = literaryWork.Price,
+            LiteraryWorkPurchasedId = literaryWork.Id,
+            Title = $"{literaryWork.Title} by {literaryWork.Writer.UserName}",
+            UserEmail = "tanakamawere15@gmail.com",
+            PhoneNumber = "0771234567",
+            Name = "Tanaka Mawere",
+            MobileGateway = MobileMoneyGateways.Ecocash
         };
 
         try
         {
-            var response = await purchaseClient.AddPurchaseAsync(purchasesDto);
+            var response = await paynowClient.InitiatePaymentAsync(paymentRequestDto);
             if (response.IsSuccess)
             {
-                snackbar = Snackbar.Add(response.Data, Severity.Success);
+                paymentInitResponseDto = response.Data;
+
+                //Check if the initialization to the paynow gateway was successful
+                if (paymentInitResponseDto.IsSuccess)
+                {
+                    //Open the payment dialog
+                    var parameters = new DialogParameters<PaymentStatusDialog>
+                    {
+                        { p => p.PollLink, paymentInitResponseDto.PollUrl  }
+                    };
+                    var options = new DialogOptions() 
+                    { 
+                        MaxWidth = MaxWidth.Medium, 
+                        FullWidth = false,
+                        CloseOnEscapeKey = false,
+                        CloseButton = false,
+                        BackdropClick = false,
+                    };
+                    var dialog = DialogService.Show<PaymentStatusDialog>("Payment Status", parameters, options);
+                    var result = await dialog.Result;
+
+                    if (!result.Canceled)
+                    {
+                        //Means payment was successful
+                        await LoadliteraryWork();
+                        StateHasChanged();
+                    }
+                }
             }
             else
             {
-                snackbar = Snackbar.Add(response.Data, Severity.Error);
+                snackbar = Snackbar.Add(response.ErrorMessage, Severity.Error);
             }
         }
         catch (Exception)
         {
-            snackbar = Snackbar.Add("Error purchasing the work", Severity.Error);
-        }
-        finally
-        {
-            await LoadliteraryWork();
-            StateHasChanged();
+            throw;
         }
     }
 }

@@ -1,0 +1,31 @@
+.bottom-tab-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: #ffffff;
+    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: space-around;
+    padding: 10px 0;
+    z-index: 10;
+}
+
+    .bottom-tab-bar .mud-tab-panel {
+        flex: 1;
+        text-align: center;
+        cursor: pointer;
+        padding: 5px 0;
+    }
+
+    .bottom-tab-bar .mud-icon-button {
+        margin: 0 auto;
+        display: block;
+    }
+
+    .bottom-tab-bar .mud-text {
+        display: block;
+        margin-top: 2px;
+        font-size: 12px;
+        color: #666;
+    }

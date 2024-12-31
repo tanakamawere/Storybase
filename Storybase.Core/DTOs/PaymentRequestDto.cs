@@ -4,6 +4,8 @@ namespace Storybase.Core.DTOs;
 public class PaymentRequestDto
 {
     public string Title { get; set; }
+    public int LiteraryWorkPurchasedId { get; set; }
+    public string UserAuthId { get; set; }
     public decimal Amount { get; set; }
     public string UserEmail { get; set; } = "tanaka@tanakamawere.co.zw";
     public string? PhoneNumber { get; set; } = "";
@@ -22,6 +24,7 @@ public class PaymentCheckResponseDto
 {
     public string Errors { get; set; }
     public bool IsSuccess { get; set; }
+    public bool WasPaid { get; set; }
     public decimal Amount { get; set; }
     public string PollUrl { get; set; }
     public string Reference { get; set; }   
