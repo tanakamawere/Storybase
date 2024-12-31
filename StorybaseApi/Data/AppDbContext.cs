@@ -145,8 +145,8 @@ public class AppDbContext : DbContext
             .HasDatabaseName("IX_LiteraryWork_WriterId");
 
         modelBuilder.Entity<Payments>()
-            .HasIndex(p => p.Reference)
-            .HasDatabaseName("IX_Payments_Reference")
+            .HasIndex(p => p.TransactionId)
+            .HasDatabaseName("IX_Payments_TransactionId")
             .IsUnique();
         modelBuilder.Entity<Payments>()
             .HasIndex(p => p.UserId)

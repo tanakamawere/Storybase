@@ -1,0 +1,43 @@
+@page "/payment/return/{transactionId}"
+@inject PaymentsClient paymentsClient
+
+@if (isBusy)
+{
+    <LoadingComponent />
+}
+else
+{
+    <div>
+        <p><strong>Id:</strong> @payment.Id</p>
+        <p><strong>Title:</strong> @payment.Title</p>
+        <p><strong>UserId:</strong> @payment.UserId</p>
+        <p><strong>Amount:</strong> @payment.Amount</p>
+        <p><strong>PollUrl:</strong> @payment.PollUrl</p>
+        <p><strong>Reference:</strong> @payment.Reference</p>
+        <p><strong>Payment Status:</strong> @payment.PaymentStatus</p>
+        <p><strong>Created At:</strong> @payment.CreatedAt</p>
+        <p><strong>Updated At:</strong> @payment.UpdatedAt?.ToString() ?? "N/A"</p>
+        <p><strong>Transaction Id:</strong> @payment.TransactionId?.ToString() ?? "N/A"</p>
+    </div>
+}
+
+@code
+{
+    [Parameter]
+    public string transactionId { get; set; }
+    private Payments payment = new();
+    private bool isBusy = false;
+
+    protected async override Task OnParametersSetAsync()
+    {
+        isBusy = true;
+
+        var response = await paymentsClient.GetPaymentByTransactionIdAsync(transactionId);
+        if (response.IsSuccess)
+        {
+            payment = response.Data;
+        }
+
+        isBusy = false;
+    }
+}

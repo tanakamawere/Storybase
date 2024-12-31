@@ -1,7 +1,5 @@
 <MudContainer Class="justify-center align-center">
-    <MudSkeleton />
-    <MudSkeleton />
-    <MudSkeleton />
+    <MudProgressCircular Indeterminate="true" Size="Size.Large"/>
     <MudText Typo="Typo.h4">
         @Message
     </MudText>
@@ -9,5 +7,5 @@
 
 @code {
     [Parameter]
-    public string Message { get; set; } = "Loading";
+    public string Message { get; set; } = "Loading...";
 }

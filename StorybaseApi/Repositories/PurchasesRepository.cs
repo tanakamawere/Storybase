@@ -61,7 +61,7 @@ namespace StorybaseApi.Repositories
         {
             var purchase = new Purchase
             {
-                User = await context.Users.FindAsync(entity.UserId),
+                User = await context.Users.FirstOrDefaultAsync(w => w.Id == int.Parse(entity.UserId)),
                 LiteraryWorkId = entity.LiteraryWorkId,
                 LiteraryWork = await context.LiteraryWorks.FirstOrDefaultAsync(lw => lw.Id == entity.LiteraryWorkId),
                 PurchaseDate = DateTime.Now

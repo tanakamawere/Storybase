@@ -1,7 +1,9 @@
-﻿@using Storybase.Core.DTOs
+﻿@using Microsoft.JSInterop
+@using Storybase.Core.DTOs
 @inject NavigationManager navManager
 @inject PayNowClient payNowClient
 @inject ISnackbar Snackbar
+@inject IJSRuntime JSRuntime
 
 <MudDialog>
     <DialogContent>
@@ -50,6 +52,8 @@
     [CascadingParameter]
     private MudDialogInstance MudDialog { get; set; }
     [Parameter]
+    public string RedirectLink { get; set; }
+    [Parameter]
     public string PollLink { get; set; }
     private PaymentCheckResponseDto paymentCheckResponseDto = new();
     Snackbar snackbar;
@@ -58,9 +62,10 @@
     protected async override Task OnParametersSetAsync()
     {
         //open the poll link
-        if (!string.IsNullOrEmpty(PollLink))
+        if (!string.IsNullOrEmpty(RedirectLink))
         {
-            navManager.NavigateTo(PollLink);
+            //Open redirect link in a new tab
+            await JSRuntime.InvokeVoidAsync("openInNewTab", RedirectLink);
         }
     }
 

@@ -1,0 +1,10 @@
+﻿<MudDialog>
+    <DialogContent>
+        <LoadingComponent Message="Loading..." />
+    </DialogContent>
+</MudDialog>
+
+@code {
+    [CascadingParameter]
+    private MudDialogInstance MudDialog { get; set; }
+}

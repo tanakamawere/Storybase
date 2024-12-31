@@ -54,5 +54,6 @@ app.MapWriterEndpoints();
 app.MapBookmarkEndpoints();
 app.MapLibraryEndpoints();
 app.MapPaynowEndpoints();
+app.MapPaymentsEndpoints();
 
 app.Run();

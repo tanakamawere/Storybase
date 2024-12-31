@@ -134,6 +134,8 @@
     private LiteraryWork literaryWork = new LiteraryWork();
     private PurchaseStatusDto purchaseStatusDto = new();
     private PaymentInitResponseDto paymentInitResponseDto = new();
+    private IDialogReference loadingDialog;
+    private IDialogReference paymentDialog;
     Snackbar snackbar;
 
     protected override async Task OnParametersSetAsync()
@@ -202,19 +204,23 @@
     //Method to purchase the work
     private async void PurchaseLiteraryWork()
     {
-        PaymentRequestDto paymentRequestDto = new PaymentRequestDto()
-        {
-            Amount = literaryWork.Price,
-            LiteraryWorkPurchasedId = literaryWork.Id,
-            Title = $"{literaryWork.Title} by {literaryWork.Writer.UserName}",
-            UserEmail = "tanakamawere15@gmail.com",
-            PhoneNumber = "0771234567",
-            Name = "Tanaka Mawere",
-            MobileGateway = MobileMoneyGateways.Ecocash
-        };
+        //Show loading dialog
+        await OpenLoadingDialog();
 
         try
         {
+            PaymentRequestDto paymentRequestDto = new PaymentRequestDto()
+            {
+                Title = $"{literaryWork.Title} by {literaryWork.Writer.UserName}",
+                UserAuthId = Auth0UserId,
+                Amount = literaryWork.Price,
+                LiteraryWorkPurchasedId = literaryWork.Id,
+                UserEmail = "tanakamawere15@gmail.com",
+                PhoneNumber = "0771234567",
+                Name = "Tanaka Mawere",
+                MobileGateway = MobileMoneyGateways.Ecocash
+            };
+
             var response = await paynowClient.InitiatePaymentAsync(paymentRequestDto);
             if (response.IsSuccess)
             {
@@ -223,25 +229,16 @@
                 //Check if the initialization to the paynow gateway was successful
                 if (paymentInitResponseDto.IsSuccess)
                 {
-                    //Open the payment dialog
-                    var parameters = new DialogParameters<PaymentStatusDialog>
-                    {
-                        { p => p.PollLink, paymentInitResponseDto.PollUrl  }
-                    };
-                    var options = new DialogOptions() 
-                    { 
-                        MaxWidth = MaxWidth.Medium, 
-                        FullWidth = false,
-                        CloseOnEscapeKey = false,
-                        CloseButton = false,
-                        BackdropClick = false,
-                    };
-                    var dialog = DialogService.Show<PaymentStatusDialog>("Payment Status", parameters, options);
+                    //Close loading dialog
+                    DialogService.Close(loadingDialog);
+                    //Open payment status dialog
+                    var dialog = await OpenPaymentDialog();
                     var result = await dialog.Result;
 
                     if (!result.Canceled)
                     {
                         //Means payment was successful
+                        snackbar = Snackbar.Add("Payment was successful", Severity.Success);
                         await LoadliteraryWork();
                         StateHasChanged();
                     }
@@ -256,5 +253,35 @@
         {
             throw;
         }
+    }
+
+    //Method to open loading dialog
+    private async Task OpenLoadingDialog()
+    {
+        var loadingoptions = new DialogOptions()
+            {
+                MaxWidth = MaxWidth.Medium,
+                FullWidth = false,
+                CloseOnEscapeKey = false,
+                CloseButton = false,
+                BackdropClick = false,
+            };
+        loadingDialog = await DialogService.ShowAsync<LoadingDialog>(null, loadingoptions);
+    }
+
+    //Method to open payment dialog
+    private async Task<IDialogReference> OpenPaymentDialog()
+    {
+
+        var parameters = new DialogParameters<PaymentStatusDialog>
+        {
+            { p => p.RedirectLink, paymentInitResponseDto.RedirectLink  },
+            { p => p.PollLink, paymentInitResponseDto.PollUrl }
+        };
+        var options = new DialogOptions()
+            {
+                MaxWidth = MaxWidth.ExtraLarge,
+            };
+        return DialogService.Show<PaymentStatusDialog>("Payment Status", parameters, options);
     }
 }

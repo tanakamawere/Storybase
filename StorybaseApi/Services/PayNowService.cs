@@ -35,8 +35,11 @@ public class PayNowService
         var resultUrl = _configuration["PayNow:ResultUrl"];
 
         var paynow = new Paynow(integrationId, integrationKey);
-        paynow.ReturnUrl = returnUrl;
+
         paynow.ResultUrl = resultUrl;
+        //Create new guid for the transaction id
+        var transactionId = Guid.NewGuid();
+        paynow.ReturnUrl = $"{returnUrl}/{transactionId}";
 
         // Create a new payment
         var payment = paynow.CreatePayment(paymentRequest.Title, paymentRequest.UserEmail);
@@ -57,7 +60,8 @@ public class PayNowService
             CreatedAt = DateTime.Now,
             UpdatedAt = DateTime.Now,
             PollUrl = response.PollUrl(),
-            Reference = $"{DateTime.Now}: {paymentRequest.LiteraryWorkPurchasedId}"
+            Reference = $"{DateTime.Now}: {paymentRequest.LiteraryWorkPurchasedId}",
+            TransactionId = transactionId
         };
 
         if (response.Success())

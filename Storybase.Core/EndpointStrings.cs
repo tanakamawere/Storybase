@@ -82,4 +82,8 @@ public class EndpointStrings
     public const string InitializePayment = "api/payments/init";
     public const string CheckPaymentStatus = "api/payments/check";
     public const string InitializeMobilePayment = "api/payments/initmobile";
+
+    //Payments endpoints
+    public const string GetPaymentById = "api/payments/getpayment";
+    public const string GetPaymentByTransactionId = "api/payments/getbytransactionid";
 }

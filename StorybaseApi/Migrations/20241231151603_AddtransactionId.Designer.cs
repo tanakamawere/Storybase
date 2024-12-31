@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using StorybaseApi.Data;
 
@@ -11,9 +12,11 @@ using StorybaseApi.Data;
 namespace StorybaseApi.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241231151603_AddtransactionId")]
+    partial class AddtransactionId
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -204,7 +207,7 @@ namespace StorybaseApi.Migrations
 
                     b.Property<string>("Reference")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -225,10 +228,9 @@ namespace StorybaseApi.Migrations
                     b.HasIndex("PaymentStatus")
                         .HasDatabaseName("IX_Payments_Status");
 
-                    b.HasIndex("TransactionId")
+                    b.HasIndex("Reference")
                         .IsUnique()
-                        .HasDatabaseName("IX_Payments_TransactionId")
-                        .HasFilter("[TransactionId] IS NOT NULL");
+                        .HasDatabaseName("IX_Payments_Reference");
 
                     b.HasIndex("UserId")
                         .HasDatabaseName("IX_Payments_UserId");

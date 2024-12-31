@@ -16,4 +16,11 @@ public class PaymentsRepository : GenericRepository<Payments>, IPaymentsReposito
             .Where(p => p.PollUrl == pollLink)
             .FirstOrDefaultAsync();
     }
+
+    public async Task<Payments> GetPaymentByTransactionId(Guid transactionId)
+    {
+        return await context.Payments
+            .Where(p => p.TransactionId == transactionId)
+            .FirstOrDefaultAsync();
+    }
 }

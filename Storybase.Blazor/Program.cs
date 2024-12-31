@@ -43,6 +43,7 @@ builder.Services.AddScoped<GenresClient>();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<DialogHelperService>();
 builder.Services.AddScoped<PayNowClient>();
+builder.Services.AddScoped<PaymentsClient>();
 
 var app = builder.Build();
 
