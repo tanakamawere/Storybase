@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Http.Json;
 using Storybase.Core.Interfaces;
 using Storybase.Core.Models;
+using Storybase.Core.Models.Payouts;
 using StorybaseApi.Endpoints;
 using StorybaseApi.Repositories;
 using StorybaseApi.Services;
@@ -27,6 +28,11 @@ builder.Services.AddScoped<IRepository<ReadingProgress>, GenericRepository<Readi
 builder.Services.AddScoped<IPaymentsRepository, PaymentsRepository>();
 builder.Services.AddScoped<ILibraryRepository, LibraryRepository>();
 builder.Services.AddScoped<IPurchaseRepository, PurchasesRepository>();
+builder.Services.AddScoped<IRepository<UserPayoutChoice>, GenericRepository<UserPayoutChoice>>();
+builder.Services.AddScoped<IRepository<PayoutMethod>, GenericRepository<PayoutMethod>>();
+builder.Services.AddScoped<IPayoutRequestRepository, PayoutRequestRepository>();
+builder.Services.AddScoped<ISalesRepository, SalesRepository>();
+builder.Services.AddScoped<IUserPayoutMethodsRepository, UserPayoutMethodsRepository>();    
 builder.Services.AddScoped<PayNowService>();
 
 builder.Services.Configure<JsonOptions>(options => {
@@ -55,5 +61,8 @@ app.MapBookmarkEndpoints();
 app.MapLibraryEndpoints();
 app.MapPaynowEndpoints();
 app.MapPaymentsEndpoints();
+app.MapSalesEndpoints();
+app.MapPayoutsEndpoints();
+app.MapUserPayoutMethodsEndpoints();
 
 app.Run();

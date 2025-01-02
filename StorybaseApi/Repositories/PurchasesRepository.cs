@@ -50,7 +50,8 @@ namespace StorybaseApi.Repositories
             {
                 User = await context.Users.FirstOrDefaultAsync(u => u.Auth0UserId == entity.AuthUserId),
                 LiteraryWorkId = entity.LiteraryWorkId,
-                LiteraryWork = await context.LiteraryWorks.FirstOrDefaultAsync(lw => lw.Id == entity.LiteraryWorkId)
+                LiteraryWork = await context.LiteraryWorks.FirstOrDefaultAsync(lw => lw.Id == entity.LiteraryWorkId),
+                Amount = entity.Amount,
             };
 
             await context.AddAsync(purchase);
@@ -64,7 +65,8 @@ namespace StorybaseApi.Repositories
                 User = await context.Users.FirstOrDefaultAsync(w => w.Id == int.Parse(entity.UserId)),
                 LiteraryWorkId = entity.LiteraryWorkId,
                 LiteraryWork = await context.LiteraryWorks.FirstOrDefaultAsync(lw => lw.Id == entity.LiteraryWorkId),
-                PurchaseDate = DateTime.Now
+                PurchaseDate = DateTime.Now, 
+                Amount = entity.Amount,
             };
 
             await context.AddAsync(purchase);

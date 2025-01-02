@@ -8,6 +8,7 @@ public class PurchasesDto
 
     // For LiteraryWork Purchases
     public int? LiteraryWorkId { get; set; }
+    public decimal Amount { get; set; }
 
     public DateTime PurchaseDate { get; set; } = DateTime.UtcNow;
 }

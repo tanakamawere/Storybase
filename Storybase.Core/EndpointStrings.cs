@@ -87,4 +87,22 @@ public class EndpointStrings
     public const string GetPaymentById = "api/payments/getpayment";
     public const string GetPaymentByTransactionId = "api/payments/getbytransactionid";
     public const string ResultUrlPaynow = "/api/payment/result";
+
+    //Payouts Request endpoints
+    public const string GetPayoutById = "api/payoutreq/getpayout";
+    public const string CreatePayout = "api/payoutreq/create";
+    public const string UpdatePayout = "api/payoutreq/update";
+    public const string DeletePayout = "api/payoutreq/delete";
+    public const string SearchPayouts = "api/payoutreq/search";
+    public const string GetAllPayouts = "api/payoutreq";
+    public const string GetPayoutsByUserAuthId = "api/payoutreq/user";
+    public const string ConfirmPayout = "api/payoutreq/confirm";
+
+    //Sales endpoints
+    public const string GetWriterSales = "api/sales/get";
+
+    //User Payout Methods
+    public const string GetUserPayoutMethods = "api/payout-methods/get";
+    public const string AddUserPayoutMethod = "api/payout-methods/add";
+    public const string UpdateUserPayoutMethod = "api/payout-methods/update";
 }

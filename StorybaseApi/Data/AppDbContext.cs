@@ -1,4 +1,5 @@
 ﻿using Storybase.Core.Models;
+using Storybase.Core.Models.Payouts;
 
 namespace StorybaseApi.Data;
 
@@ -14,9 +15,26 @@ public class AppDbContext : DbContext
     public DbSet<Payments> Payments { get; set; }
     public DbSet<User> Users { get; set; }
     public DbSet<ReadingProgress> ReadingProgress { get; set; }
+    public DbSet<PayoutRequest> PayoutRequests { get; set; }
+    public DbSet<PayoutMethod> PayoutMethods { get; set; }
+    public DbSet<UserPayoutChoice> UserPayoutChoices { get; set; }
+    public DbSet<PlatformSetting> PlatformSettings { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        //PayoutRequest relationships
+        modelBuilder.Entity<PayoutRequest>()
+            .HasOne(pr => pr.User)
+            .WithMany(u => u.PayoutRequests)
+            .HasForeignKey(pr => pr.UserId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<PayoutRequest>()
+            .HasOne(pr => pr.UserPayoutMethod)
+            .WithMany()
+            .HasForeignKey(pr => pr.PayoutMethodId)
+            .OnDelete(DeleteBehavior.Restrict);
+
         // Configure many-to-many relationships
         modelBuilder.Entity<LiteraryWork>()
             .HasMany(l => l.Genres)
@@ -161,6 +179,19 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<Payments>()
             .HasIndex(p => p.PaymentStatus)
             .HasDatabaseName("IX_Payments_Status");
+        //Index for the UserPayoutChoice table
+        modelBuilder.Entity<UserPayoutChoice>()
+            .HasIndex(upc => upc.UserId)
+            .HasDatabaseName("IX_UserPayoutChoice_UserId");
+
+        modelBuilder.Entity<PayoutRequest>()
+            .HasIndex(pr => pr.UserId)
+            .HasDatabaseName("IX_PayoutRequest_UserId");
+
+        //Base cut percentage for storybase
+        modelBuilder.Entity<PlatformSetting>().HasData(
+            new PlatformSetting { Id = 1, SettingKey = "PlatformCutPercentage", SettingValue = "25" }
+        );
 
     }
 }

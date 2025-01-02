@@ -2,10 +2,7 @@
 using Storybase.Core.DTOs;
 using Storybase.Core.Interfaces;
 using Storybase.Core.Models;
-using StorybaseApi.Repositories;
 using StorybaseApi.Services;
-using System.Security.Cryptography;
-using System.Text;
 
 namespace StorybaseApi.Endpoints;
 

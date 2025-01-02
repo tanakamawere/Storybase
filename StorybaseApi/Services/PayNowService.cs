@@ -186,6 +186,7 @@ public class PayNowService
         {
             UserId = payment.UserId,
             LiteraryWorkId = int.Parse(payment.Title),
+            Amount = payment.Amount,
             PurchaseDate = DateTime.Now
         };
         await purchaseRepository.AddPurchaseAfterPayment(purchase);

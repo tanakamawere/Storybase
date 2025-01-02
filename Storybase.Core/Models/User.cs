@@ -1,4 +1,6 @@
-﻿namespace Storybase.Core.Models;
+﻿using Storybase.Core.Models.Payouts;
+
+namespace Storybase.Core.Models;
 
 public class User
 {
@@ -9,5 +11,7 @@ public class User
     public string Email { get; set; }
 
     public ICollection<Purchase> Purchases { get; set; } = new List<Purchase>();
+    public ICollection<PayoutRequest> PayoutRequests { get; set; }
+    public ICollection<UserPayoutChoice> PayoutMethods { get; set; }
 }
 
