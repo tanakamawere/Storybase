@@ -2,6 +2,7 @@
 using Storybase.Core;
 using Storybase.Application.Interfaces;
 using Storybase.Application.Models;
+using Storybase.Core.DTOs;
 
 namespace Storybase.Application.Services;
 
@@ -42,5 +43,10 @@ public class UserClient
     public async Task<ApiResponse<IEnumerable<User>>> GetUsersAsync()
     {
         return await _apiClient.GetAsync<IEnumerable<User>>(EndpointStrings.GetAllUsers);
+    }
+    // Check if user exists
+    public async Task<ApiResponse<bool>> CheckIfUserExistsAsync(UserDto user)
+    {
+        return await _apiClient.PostAsync<bool>($"{EndpointStrings.CheckIfUserExists}", user);
     }
 }

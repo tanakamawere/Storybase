@@ -9,8 +9,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Storybase.Application", "St
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Storybase.Maui", "Storybase.Maui\Storybase.Maui.csproj", "{AC36525A-8D1F-4A58-9F09-7A7DF014CDC3}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Maui.Apps.Framework", "..\Maui.Apps.Framework\Maui.Apps.Framework.csproj", "{2FB78F75-9C33-4098-B778-0CFBE7433322}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Storybase.Components", "Storybase.Components\Storybase.Components.csproj", "{62537FEB-DEA8-4858-B23F-7D7ECB03B667}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Storybase.Blazor", "Storybase.Blazor\Storybase.Blazor.csproj", "{AE15CBF2-1BD2-4D16-8649-B5E09688371C}"
@@ -37,10 +35,6 @@ Global
 		{AC36525A-8D1F-4A58-9F09-7A7DF014CDC3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AC36525A-8D1F-4A58-9F09-7A7DF014CDC3}.Release|Any CPU.Build.0 = Release|Any CPU
 		{AC36525A-8D1F-4A58-9F09-7A7DF014CDC3}.Release|Any CPU.Deploy.0 = Release|Any CPU
-		{2FB78F75-9C33-4098-B778-0CFBE7433322}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2FB78F75-9C33-4098-B778-0CFBE7433322}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2FB78F75-9C33-4098-B778-0CFBE7433322}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2FB78F75-9C33-4098-B778-0CFBE7433322}.Release|Any CPU.Build.0 = Release|Any CPU
 		{62537FEB-DEA8-4858-B23F-7D7ECB03B667}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{62537FEB-DEA8-4858-B23F-7D7ECB03B667}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{62537FEB-DEA8-4858-B23F-7D7ECB03B667}.Release|Any CPU.ActiveCfg = Release|Any CPU

@@ -1,4 +1,5 @@
-﻿using Storybase.Core.Models;
+﻿using Storybase.Core.DTOs;
+using Storybase.Core.Models;
 
 namespace Storybase.Core.Interfaces;
 
@@ -9,4 +10,5 @@ public interface IUserRepository : IRepository<User>
     // Check if email is taken
     Task<bool> IsEmailTakenAsync(string email);
     Task<string> GetUserId(string auth0UserId);
+    Task<bool> CheckIfUserExistsAsync(UserDto user);
 }

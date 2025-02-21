@@ -67,8 +67,6 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseAntiforgery();
 
-app.UseAntiforgery();
-
 app.MapGet("/Account/Login", async (HttpContext httpContext, string returnUrl = "/") =>
 {
     var authenticationProperties = new LoginAuthenticationPropertiesBuilder()

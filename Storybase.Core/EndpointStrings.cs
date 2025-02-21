@@ -37,6 +37,7 @@ public class EndpointStrings
     public const string DeleteUser = "api/users/delete";
     public const string SearchUsers = "api/users/search";
     public const string GetAllUsers = "api/users";
+    public const string CheckIfUserExists = "api/users/exists";
 
     //Chapter Endpoints
     public const string GetChapterById = "api/chapters/getchapter";

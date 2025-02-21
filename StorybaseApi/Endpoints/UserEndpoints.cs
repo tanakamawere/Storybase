@@ -1,4 +1,5 @@
 ﻿using Storybase.Core;
+using Storybase.Core.DTOs;
 using Storybase.Core.Interfaces;
 using Storybase.Core.Models;
 
@@ -48,6 +49,16 @@ public static class UserEndpoints
         {
             var Users = await repository.GetAllAsync();
             return TypedResults.Ok(Users);
+        });
+        //Check if user exists
+        app.MapPost(EndpointStrings.CheckIfUserExists, async Task<Results<Ok<bool>, BadRequest>> (IUserRepository repository, UserDto user) =>
+        {
+            var response = await repository.CheckIfUserExistsAsync(user);
+            if (response)
+            {
+                return TypedResults.Ok(true);
+            }
+            return TypedResults.Ok(false);
         });
 
         return app;

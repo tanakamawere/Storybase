@@ -8,6 +8,7 @@ public class User
     public string Auth0UserId { get; set; } // Auth0 identifier.
 
     public string Name { get; set; }
+    public string ImageUrl { get; set; }
     public string Email { get; set; }
 
     public ICollection<Purchase> Purchases { get; set; } = new List<Purchase>();

@@ -4,6 +4,8 @@
 @using Storybase.Core.Models
 @inject LiteraryWorkClient literaryWorkClient
 @inject NavigationManager navManager
+@inject UserService userService
+@inject UserClient userClient
 @attribute [Authorize]
 
 <MudContainer Class="cards-section">
@@ -60,6 +62,7 @@
     {
         await base.OnInitializedAsync();
         await LoadBooks();
+        await CheckUser();
     }
 
     private async Task LoadBooks()
@@ -121,5 +124,26 @@
     private void GoToBookDetails(int id)
     {
         navManager.NavigateTo($"/details/{id}");
+    }
+
+    //Check if the user exists on start up
+    private async Task CheckUser()
+    {
+        //TODO: Make sure user is being created on app start-up
+        var user = await userService.GetUserAsync();
+
+        var response = await userClient.CheckIfUserExistsAsync(user);
+
+        if (response.IsSuccess)
+        {
+            if (response.Data)
+            {
+                Console.WriteLine("User made on server");
+            }
+        }
+        else
+        {
+            Console.WriteLine("User not made");
+        }
     }
 }
