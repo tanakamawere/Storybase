@@ -1,0 +1,19 @@
+<MudStack Spacing="2">
+    <div>
+        <MudText Typo="Typo.h6">@Title</MudText>
+        <MudText Typo="Typo.caption">@Subtitle</MudText>
+    </div>
+
+    <MudPaper Class="pa-5" Elevation="2">
+        @ChildContent
+    </MudPaper>
+</MudStack>
+
+@code {
+    [Parameter]
+    public string Title { get; set; } = "Screen";
+    [Parameter]
+    public string Subtitle { get; set; } = "Toggle things on and off";
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+}

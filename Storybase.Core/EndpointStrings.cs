@@ -106,4 +106,7 @@ public class EndpointStrings
     public const string GetUserPayoutMethods = "api/payout-methods/get";
     public const string AddUserPayoutMethod = "api/payout-methods/add";
     public const string UpdateUserPayoutMethod = "api/payout-methods/update";
+
+    //General endpoints
+    public const string Search = "api/search";
 }

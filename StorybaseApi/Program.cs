@@ -34,6 +34,7 @@ builder.Services.AddScoped<IPayoutRequestRepository, PayoutRequestRepository>();
 builder.Services.AddScoped<ISalesRepository, SalesRepository>();
 builder.Services.AddScoped<IUserPayoutMethodsRepository, UserPayoutMethodsRepository>();    
 builder.Services.AddScoped<PayNowService>();
+builder.Services.AddScoped<IGeneralRepository, GeneralRepository>();
 
 builder.Services.Configure<JsonOptions>(options => {
     options.SerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
@@ -64,5 +65,6 @@ app.MapPaymentsEndpoints();
 app.MapSalesEndpoints();
 app.MapPayoutsEndpoints();
 app.MapUserPayoutMethodsEndpoints();
+app.MapGeneralEndpoints();
 
 app.Run();

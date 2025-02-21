@@ -1,12 +1,22 @@
 ﻿@using Storybase.Application.Services
+@using Storybase.Core.DTOs
 @inject WriterClient writerClient
+@inject UserService userService
 
 <MudNavMenu>
     <CascadingAuthenticationState>
         ﻿<AuthorizeView>
             <Authorized>
-                <MudNavLink Href="/profile">Hello @UserName</MudNavLink>
-                <MudNavLink Href="Account/Logout">Log out</MudNavLink>
+                <MudGrid Justify="Justify.Center" Spacing="1" Class="pa-1 align-center">
+                    <MudItem xs="2">
+                        <MudAvatar>
+                            <MudImage Src="@userDto.ImageUrl" />
+                        </MudAvatar>
+                    </MudItem>
+                    <MudItem xs="10">
+                        <MudNavLink Href="/settings#profile">Hello @userDto.Name</MudNavLink>
+                    </MudItem>
+                </MudGrid>
             </Authorized>
             <NotAuthorized>
                 <MudNavLink Href="Account/Login">Log in</MudNavLink>
@@ -18,16 +28,16 @@
     </CascadingAuthenticationState>
     <MudDivider />
     <MudNavLink Icon="@Icons.Material.Filled.Home" Href="/home">
-        Home    
+        Home
+    </MudNavLink>
+    <MudNavLink Icon="@Icons.Material.Filled.Search" Href="/search">
+        Search
     </MudNavLink>
     <MudNavLink Icon="@Icons.Material.Filled.LibraryBooks" Href="/library">
         Library
     </MudNavLink>
     <MudNavLink Icon="@Icons.Material.Filled.Settings" Match="NavLinkMatch.All" Href="/settings">
         Settings
-    </MudNavLink>
-    <MudNavLink Icon="@Icons.Material.Filled.Help" Href="/help">
-        Help
     </MudNavLink>
 
     <MudDivider />
@@ -38,40 +48,32 @@
                 Writing Dashboard
             </MudNavLink>
         }
-        else
-        {
-            <MudNavLink Icon="@Icons.Material.Filled.Create" Href="/writing/addwriter">
-                Become a Writer
-            </MudNavLink>
-        }
     </div>
 </MudNavMenu>
 
 @code {
-    private string UserName = "";
+    private UserDto userDto;
     string auth0UserId = "";
     bool isWriter = false;
-    [CascadingParameter]
-    private Task<AuthenticationState> authenticationState { get; set; }
-
 
     protected override async Task OnInitializedAsync()
     {
-        if (authenticationState is not null)
-        {
-            var state = await authenticationState;
-            UserName = state?.User?.Identity?.Name ?? string.Empty;
+        await GetUserDetailsAsync();
+        await CheckIfUserIsWriterAsync();
+    }
 
-            //Get user id
-            auth0UserId = state.
-                        User.
-                        Claims.
-                        FirstOrDefault(c => c.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")?.
-                        Value ?? "";
-            //Check if user is a writer
-            var response = await writerClient.HasWriterProfileAsync(auth0UserId);
-            if (response.IsSuccess)
-                isWriter = response.Data;
-        }
+    //Get user profile details
+    private async Task GetUserDetailsAsync()
+    {
+        userDto = await userService.GetUserAsync();
+    }
+
+    //check if the user is a writer
+    private async Task CheckIfUserIsWriterAsync()
+    {
+        //Check if user is a writer
+        var response = await writerClient.HasWriterProfileAsync(await userService.GetAuth0UserIdAsync());
+        if (response.IsSuccess)
+            isWriter = response.Data;
     }
 }

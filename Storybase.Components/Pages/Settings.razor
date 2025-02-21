@@ -1,7 +1,84 @@
 ﻿@page "/settings"
+@using Storybase.Components.Controls
+@inject WriterClient writerClient
+@inject UserService userService
 
-<h3>Settings</h3>
+<MudContainer>
 
-@code {
+    <HeaderComponent Title="Settings" Subtitle="Tweak Storybase to your liking..." />
 
+    <MudContainer MaxWidth="MaxWidth.Medium">
+        <SettingsItemTemplate Title="Theme" Subtitle="Change the colour scheme of Storybase">
+
+            <MudNavLink Icon="@(_isDarkMode ? Icons.Material.Outlined.LightMode : Icons.Material.Outlined.DarkMode)"
+                        OnClick="ToggleTheme">
+                Theme: @(_isDarkMode ? "Dark Mode" : "Light Mode")
+            </MudNavLink>
+        </SettingsItemTemplate>
+
+        <SettingsItemTemplate Title="Writing" Subtitle="Toggle things on and off">
+            @if (IsWriter)
+            {
+                <MudNavLink Icon="@Icons.Material.Filled.Create" Href="/writing/dashboard">
+                    Writing Dashboard
+                </MudNavLink>
+            }
+            else
+            {
+                <MudNavLink Icon="@Icons.Material.Filled.Create" Href="/writing/addwriter">
+                    Become a Writer
+                </MudNavLink>
+            }
+        </SettingsItemTemplate>
+
+        <SettingsItemTemplate Title="Account">
+            <MudNavLink Href="Account/Logout">Log out</MudNavLink>            
+        </SettingsItemTemplate>
+
+    </MudContainer>
+
+</MudContainer>
+
+@code{
+    private MudThemeProvider _mudThemeProvider;
+    private bool _isDarkMode;
+    bool IsWriter = false;
+
+
+    MudTheme someTheme = new()
+        {
+            PaletteLight = new PaletteLight()
+            {
+                Primary = Colors.Blue.Darken2,
+                AppbarBackground = Colors.Blue.Accent1,
+            },
+            PaletteDark = new PaletteDark()
+            {
+                Primary = Colors.Blue.Lighten1
+            },
+        };
+
+    private async Task OnSystemPreferenceChanged(bool newValue)
+    {
+        _isDarkMode = newValue;
+        StateHasChanged();
+    }
+
+    //Method to change theme on click
+    private void ToggleTheme()
+    {
+        _isDarkMode = !_isDarkMode;
+        StateHasChanged();
+    }
+
+    //Check of the user is a writer
+    protected override async Task OnInitializedAsync()
+    {
+        //Check if user is a writer
+        var response = await writerClient.HasWriterProfileAsync(await userService.GetAuth0UserIdAsync());
+        if (response.IsSuccess)
+        {
+            IsWriter = response.Data;
+        }
+    }
 }

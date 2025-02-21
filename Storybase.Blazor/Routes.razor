@@ -1,7 +1,8 @@
 ﻿<Router AppAssembly="typeof(Program).Assembly" 
         AdditionalAssemblies="new[] 
         { 
-            typeof(Storybase.Components.Pages.Explore).Assembly
+            typeof(Storybase.Components.Pages.Explore).Assembly,
+            typeof(Storybase.Components.Pages.Writing.WriterDashboard).Assembly
         }">
     <Found Context="routeData">
         <Microsoft.AspNetCore.Components.Authorization.AuthorizeRouteView RouteData="routeData" DefaultLayout="typeof(Storybase.Blazor.MainLayout)" />

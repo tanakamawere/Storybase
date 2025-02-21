@@ -1,0 +1,134 @@
+@page "/search"
+@using Storybase.Core.DTOs
+@inject GeneralClient apiClient
+@inject NavigationManager navManager
+
+<MudContainer>
+    <HeaderComponent Title="Search" />
+
+    <MudTextField T="string"
+    @bind-Value="searchString"
+    Label="Search"
+    Variant="Variant.Outlined"
+    Adornment="Adornment.End"
+    AdornmentIcon="@Icons.Material.Filled.Search"
+    AdornmentColor="Color.Secondary"
+    Immediate="true"
+    OnKeyUp="@(e => SearchAsync())" />
+
+    <MudContainer Class="mt-6">
+        @if (IsBusy)
+        {
+            <LoadingComponent Message="Searching..." />
+        }
+        else if (SearchDto != null)
+        {
+            @if (SearchDto.LiteraryWorks != null)
+            {
+                <MudText Typo="Typo.h5" Class="mb-8">
+                    Literary Works
+                </MudText>
+                <MudGrid>
+                    @foreach (var item in SearchDto.LiteraryWorks)
+                    {
+                        <MudItem xs="6" sm="4" md="3">
+                            <MudPaper @onclick="() => GoToBookDetails(item.Id)" Class="align-center justify-center pa-1">
+                                <MudGrid Class="align-center" Justify="Justify.Center">
+                                    <MudItem xs="3">
+                                        <MudImage Src="@item.CoverImageUrl" Alt="@item.Title" Style="max-height:80px" />
+                                    </MudItem>
+                                    <MudItem xs="9">
+                                        <div>
+                                            <MudText Typo="Typo.h5">@item.Title</MudText>
+                                            <MudText Typo="Typo.h6">@item.Writer.UserName</MudText>
+
+                                            <MudChipSet T="Genre">
+
+                                                @foreach (var genre in item.Genres)
+                                                {
+                                                    <MudChip Size="Size.Small" Value="@genre.Id" Text="@genre.Name">
+                                                        @genre.Name
+                                                    </MudChip>
+                                                }
+                                            </MudChipSet>
+                                        </div>
+                                    </MudItem>
+                                </MudGrid>
+                            </MudPaper>
+                        </MudItem>
+                    }
+                </MudGrid>
+            }
+
+            @if (SearchDto.Writers != null)
+            {
+                <MudText Typo="Typo.h5">
+                    Writers
+                </MudText>
+                <MudGrid>
+                    @foreach (var item in SearchDto.Writers)
+                    {
+                        <MudItem xs="6" sm="4" md="3">
+                            <MudPaper onclick="@($"/writer/{item.UserName}")">
+                                <MudGrid Justify="Justify.Center" Spacing="1" Class="pa-1 align-center">
+                                    <MudItem xs="2">
+                                        <MudAvatar>
+                                            <MudImage Src="@item.User.ImageUrl" />
+                                        </MudAvatar>
+                                    </MudItem>
+                                    <MudItem xs="10">
+                                        <MudText Typo="Typo.subtitle1">@item.UserName</MudText>
+                                    </MudItem>
+                                </MudGrid>
+                            </MudPaper>
+                        </MudItem>
+                    }
+                </MudGrid>
+            }
+        }
+        else if (SearchDto == null)
+        {
+            <EmptyComponent Message="Search for your books..." />
+        }
+    </MudContainer>
+</MudContainer>
+
+@code {
+    public SearchDto SearchDto = new();
+    public string searchString { get; set; } = "";
+    bool IsBusy = false;
+
+    private async Task SearchAsync()
+    {
+        IsBusy = true;
+        try
+        {
+            if (string.IsNullOrWhiteSpace(searchString))
+            {
+                SearchDto = null;
+                return;
+            }
+
+            var response = await apiClient.SearchAsync(searchString);
+
+            if (response.IsSuccess)
+            {
+                SearchDto = response.Data;
+            }
+        }
+        catch (Exception ex)
+        {
+            throw new Exception(searchString, ex);
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+
+    private void GoToBookDetails(int id)
+    {
+        navManager.NavigateTo($"/details/{id}");
+    }
+}

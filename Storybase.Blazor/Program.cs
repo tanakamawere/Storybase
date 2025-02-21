@@ -47,6 +47,7 @@ builder.Services.AddScoped<PaymentsClient>();
 builder.Services.AddScoped<PayoutRequestsClient>();
 builder.Services.AddScoped<SalesClient>();
 builder.Services.AddScoped<UserPayoutMethodsClient>();
+builder.Services.AddScoped<GeneralClient>();
 
 var app = builder.Build();
 

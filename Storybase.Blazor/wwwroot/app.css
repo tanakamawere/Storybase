@@ -49,3 +49,26 @@ h1:focus {
 .darker-border-checkbox.form-check-input {
     border-color: #929292;
 }
+
+.horizontal-scroll {
+    display: flex;
+    overflow-x: auto;
+    gap: 10px;
+    padding: 10px 0;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+}
+
+    .horizontal-scroll::-webkit-scrollbar {
+        height: 6px;
+    }
+
+    .horizontal-scroll::-webkit-scrollbar-thumb {
+        background-color: rgba(0, 0, 0, 0.2);
+        border-radius: 3px;
+    }
+
+    .horizontal-scroll > * {
+        flex: 0 0 auto;
+    }
+
