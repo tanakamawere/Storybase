@@ -10,7 +10,7 @@ on:
 
 jobs:
   build:
-    if: contains(github.event.head_commit.message, '[deploy-api]')
+    if: contains(join(github.event.commits.*.message, ' '), '[deploy-api]')
     runs-on: ubuntu-latest
     permissions:
       contents: read #This is required for actions/checkout
@@ -36,7 +36,7 @@ jobs:
           path: ${{env.DOTNET_ROOT}}/myapp
 
   deploy:
-    if: contains(github.event.head_commit.message, '[deploy-api]')
+    if: contains(join(github.event.commits.*.message, ' '), '[deploy-api]')
     runs-on: ubuntu-latest
     needs: build
     environment:
