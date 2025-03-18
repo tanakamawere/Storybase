@@ -23,7 +23,7 @@ configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: t
 var connectionString = environment == Environments.Development ? configuration.GetConnectionString("LocalDatabase") : configuration.GetConnectionString("OnlineDatabase");
 
 //Write to console which environment is being used
-Console.WriteLine($"Storybase Database: {connectionString}");
+Console.WriteLine($"Storybase database: {connectionString}");
 
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
