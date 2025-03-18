@@ -1,17 +1,21 @@
-name: Azure Static Web Apps CI/CD
+name: WASM Build & Deploy
 
 on:
   push:
     branches:
       - master
-  pull_request:
-    types: [opened, synchronize, reopened, closed]
-    branches:
-      - master
+    paths:
+      - "Storybase.Wasm/**"  # Runs only if WASM files change
+  workflow_dispatch:
+    inputs:
+      forceDeploy:
+        description: "Force deploy WASM"
+        required: false
+        type: boolean
 
 jobs:
   build_and_deploy_job:
-    if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
+    if: contains(github.event.head_commit.message, '[deploy-wasm]') || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     name: Build and Deploy Job
     permissions:
