@@ -14,10 +14,22 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+
+// Read command line arguments
+var environment = args.Contains("--local") ? Environments.Development : Environments.Production;
+
+var configuration = builder.Configuration;
+configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+var connectionString = environment == Environments.Development ? configuration.GetConnectionString("LocalDatabase") : configuration.GetConnectionString("OnlineDatabase");
+
+//Write to console which environment is being used
+Console.WriteLine($"Storybase Database: {connectionString}");
+
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
-    options.UseSqlServer(builder.Configuration.GetConnectionString("StorybaseDbContext"));
+    options.UseSqlServer(connectionString);
 });
+
 builder.Services.AddScoped<ILiteraryWorkRepository, LiteraryWorkRepository>();
 builder.Services.AddScoped<IGenreRepository, GenreRepository>();
 builder.Services.AddScoped<IRepository<Chapter>, ChapterRepository>();
@@ -46,7 +58,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("StorybasePolicy", policy =>
     {
-        policy.WithOrigins("http://localhost:5115", "https://app.storybase.co.zw")
+        policy.WithOrigins("http://localhost:5115", "https://app.storybase.co.zw", "https://polite-coast-0c05b4f03.6.azurestaticapps.net")
                .AllowAnyHeader().AllowAnyMethod();
     });
 });
