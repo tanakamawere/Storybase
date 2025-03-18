@@ -64,5 +64,29 @@ public class UserService
             throw new Exception("Error getting user", ex);
         }
     }
+
+    public async Task<bool> IsLoggedIn()
+    {
+        var authState = await _authenticationStateProvider.GetAuthenticationStateAsync();
+        if (authState.User.Identity.IsAuthenticated)
+        {
+            return true;
+        }
+        return false;
+    }
+    private async Task<User> GetUserObjectAsync()
+    {
+        var authState = await _authenticationStateProvider.GetAuthenticationStateAsync();
+        claimsPrincipal = authState.User;
+
+        // Create a new user
+        return new User
+        {
+            Name = claimsPrincipal.FindFirst("nickname")?.Value,
+            Email = claimsPrincipal.FindFirst("name")?.Value,
+            Auth0UserId = claimsPrincipal.FindFirst("sub")?.Value,
+            ImageUrl = claimsPrincipal.FindFirst("picture")?.Value
+        };
+    }
 }
 

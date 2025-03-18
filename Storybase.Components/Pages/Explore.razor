@@ -34,7 +34,7 @@
     IEnumerable<LiteraryWork> filteredLiteraryWorks { get; set; } = Enumerable.Empty<LiteraryWork>();
     string searchQuery { get; set; } = string.Empty;
     IEnumerable<Genre> genres { get; set; } = Enumerable.Empty<Genre>();
-    IReadOnlyCollection<Genre> selectedGenres { get; set; }
+    IReadOnlyCollection<Genre> selectedGenres { get; set; } = [];
     bool isBusy = false;
 
     protected override async Task OnInitializedAsync()

@@ -204,54 +204,62 @@
     //Method to purchase the work
     private async void PurchaseLiteraryWork()
     {
-        //Show loading dialog
-        await OpenLoadingDialog();
-
-        try
+        //First check if user is logged in
+        if (await userService.IsLoggedIn())
         {
-            PaymentRequestDto paymentRequestDto = new PaymentRequestDto()
+            //Show loading dialog
+            await OpenLoadingDialog();
+
+            try
             {
-                Title = $"{literaryWork.Title} by {literaryWork.Writer.UserName}",
-                UserAuthId = Auth0UserId,
-                Amount = literaryWork.Price,
-                LiteraryWorkPurchasedId = literaryWork.Id,
-                UserEmail = "tanakamawere15@gmail.com",
-                PhoneNumber = "0771234567",
-                Name = "Tanaka Mawere",
-                MobileGateway = MobileMoneyGateways.Ecocash
-            };
-
-            var response = await paynowClient.InitiatePaymentAsync(paymentRequestDto);
-            if (response.IsSuccess)
-            {
-                paymentInitResponseDto = response.Data;
-
-                //Check if the initialization to the paynow gateway was successful
-                if (paymentInitResponseDto.IsSuccess)
-                {
-                    //Close loading dialog
-                    DialogService.Close(loadingDialog);
-                    //Open payment status dialog
-                    var dialog = await OpenPaymentDialog();
-                    var result = await dialog.Result;
-
-                    if (!result.Canceled)
+                PaymentRequestDto paymentRequestDto = new PaymentRequestDto()
                     {
-                        //Means payment was successful
-                        snackbar = Snackbar.Add("Payment was successful", Severity.Success);
-                        await LoadliteraryWork();
-                        StateHasChanged();
+                        Title = $"{literaryWork.Title} by {literaryWork.Writer.UserName}",
+                        UserAuthId = Auth0UserId,
+                        Amount = literaryWork.Price,
+                        LiteraryWorkPurchasedId = literaryWork.Id,
+                        UserEmail = "tanakamawere15@gmail.com",
+                        PhoneNumber = "0771234567",
+                        Name = "Tanaka Mawere",
+                        MobileGateway = MobileMoneyGateways.Ecocash
+                    };
+
+                var response = await paynowClient.InitiatePaymentAsync(paymentRequestDto);
+                if (response.IsSuccess)
+                {
+                    paymentInitResponseDto = response.Data;
+
+                    //Check if the initialization to the paynow gateway was successful
+                    if (paymentInitResponseDto.IsSuccess)
+                    {
+                        //Close loading dialog
+                        DialogService.Close(loadingDialog);
+                        //Open payment status dialog
+                        var dialog = await OpenPaymentDialog();
+                        var result = await dialog.Result;
+
+                        if (!result.Canceled)
+                        {
+                            //Means payment was successful
+                            snackbar = Snackbar.Add("Payment was successful", Severity.Success);
+                            await LoadliteraryWork();
+                            StateHasChanged();
+                        }
                     }
                 }
+                else
+                {
+                    snackbar = Snackbar.Add(response.ErrorMessage, Severity.Error);
+                }
             }
-            else
+            catch (Exception)
             {
-                snackbar = Snackbar.Add(response.ErrorMessage, Severity.Error);
+                throw;
             }
         }
-        catch (Exception)
+        else
         {
-            throw;
+            Snackbar.Add("First log in", Severity.Warning);
         }
     }
 

@@ -15,6 +15,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Storybase.Blazor", "Storyba
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Storybase.Core", "Storybase.Core\Storybase.Core.csproj", "{873CDD56-C5CC-42AA-B48C-E2808F8A1C44}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Storybase.Wasm", "Storybase.Wasm\Storybase.Wasm.csproj", "{4ACE0839-EC55-46BB-BAC5-23AF721F6B91}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -47,6 +49,10 @@ Global
 		{873CDD56-C5CC-42AA-B48C-E2808F8A1C44}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{873CDD56-C5CC-42AA-B48C-E2808F8A1C44}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{873CDD56-C5CC-42AA-B48C-E2808F8A1C44}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4ACE0839-EC55-46BB-BAC5-23AF721F6B91}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4ACE0839-EC55-46BB-BAC5-23AF721F6B91}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4ACE0839-EC55-46BB-BAC5-23AF721F6B91}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4ACE0839-EC55-46BB-BAC5-23AF721F6B91}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

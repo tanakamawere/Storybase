@@ -41,7 +41,19 @@ builder.Services.Configure<JsonOptions>(options => {
 
 });
 
+//Add services to the container.
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("StorybasePolicy", policy =>
+    {
+        policy.WithOrigins("http://localhost:5115", "https://app.storybase.co.zw")
+               .AllowAnyHeader().AllowAnyMethod();
+    });
+});
+
 var app = builder.Build();
+// Configure the HTTP request pipeline.
+app.UseCors("StorybasePolicy");
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

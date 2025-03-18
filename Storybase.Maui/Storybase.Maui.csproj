@@ -50,6 +50,7 @@
 
     <ItemGroup>
         <PackageReference Include="Auth0.OidcClient.MAUI" Version="1.0.1" />
+        <PackageReference Include="Microsoft.Extensions.Http" Version="9.0.3" />
         <PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
         <PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="$(MauiVersion)" />
         <PackageReference Include="Microsoft.AspNetCore.Components.WebView.Maui" Version="$(MauiVersion)" />
@@ -58,7 +59,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\Maui.Apps.Framework\Maui.Apps.Framework.csproj" />
 		<ProjectReference Include="..\Storybase.Components\Storybase.Components.csproj" />
 		<ProjectReference Include="..\Storybase.Core\Storybase.Core.csproj" />
 		<ProjectReference Include="..\StorybaseLibrary\Storybase.Application.csproj" />

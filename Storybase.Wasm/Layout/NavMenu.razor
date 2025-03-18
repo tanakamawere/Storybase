@@ -1,0 +1,61 @@
+﻿@using Microsoft.AspNetCore.Components.Authorization
+@using Storybase.Application.Services
+@using Storybase.Core.DTOs
+@inject WriterClient writerClient
+@inject UserService userService
+
+<MudNavMenu>
+    <CascadingAuthenticationState>
+        <Storybase.Wasm.Pages.AccessControl />
+    </CascadingAuthenticationState>
+    <MudDivider />
+    <MudNavLink Icon="@Icons.Material.Filled.Home" Href="/home">
+        Home
+    </MudNavLink>
+    <MudNavLink Icon="@Icons.Material.Filled.Search" Href="/search">
+        Search
+    </MudNavLink>
+    <MudNavLink Icon="@Icons.Material.Filled.LibraryBooks" Href="/library">
+        Library
+    </MudNavLink>
+    <MudNavLink Icon="@Icons.Material.Filled.Settings" Match="NavLinkMatch.All" Href="/settings">
+        Settings
+    </MudNavLink>
+
+    <MudDivider />
+    <div>
+        @if (isWriter)
+        {
+            <MudNavLink Icon="@Icons.Material.Filled.Create" Href="/writing/dashboard">
+                Writing Dashboard
+            </MudNavLink>
+        }
+    </div>
+</MudNavMenu>
+
+@code {
+    private UserDto userDto;
+    string auth0UserId = "";
+    bool isWriter = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetUserDetailsAsync();
+        await CheckIfUserIsWriterAsync();
+    }
+
+    //Get user profile details
+    private async Task GetUserDetailsAsync()
+    {
+        userDto = await userService.GetUserAsync();
+    }
+
+    //check if the user is a writer
+    private async Task CheckIfUserIsWriterAsync()
+    {
+        //Check if user is a writer
+        var response = await writerClient.HasWriterProfileAsync(await userService.GetAuth0UserIdAsync());
+        if (response.IsSuccess)
+            isWriter = response.Data;
+    }
+}
