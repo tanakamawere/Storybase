@@ -4,14 +4,6 @@ on:
   push:
     branches:
       - master
-    paths:
-      - "Storybase.Wasm/**"  # Runs only if WASM files change
-  workflow_dispatch:
-    inputs:
-      forceDeploy:
-        description: "Force deploy WASM"
-        required: false
-        type: boolean
 
 jobs:
   build_and_deploy_job:
