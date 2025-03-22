@@ -1,24 +1,16 @@
 # Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
 # More GitHub Actions for Azure: https://github.com/Azure/actions
 
-name: Deploy Storybase API
+name: Apistorybase Thingy
 
 on:
   push:
     branches:
       - master
-    paths:
-      - "StorybaseApi/**"  # Runs only if API files change
   workflow_dispatch:
-    inputs:
-      forceDeploy:
-        description: "Force deploy API"
-        required: false
-        type: boolean
 
 jobs:
   build:
-    if: contains(github.event.head_commit.message, '[deploy-api]') || github.event_name == 'workflow_dispatch' || github.event_name == 'push'
     runs-on: ubuntu-latest
     permissions:
       contents: read #This is required for actions/checkout
@@ -44,34 +36,23 @@ jobs:
           path: ${{env.DOTNET_ROOT}}/myapp
 
   deploy:
-    if: contains(github.event.head_commit.message, '[deploy-api]') || github.event_name == 'workflow_dispatch' || github.event_name == 'push'
     runs-on: ubuntu-latest
     needs: build
     environment:
       name: 'Production'
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
-    permissions:
-      id-token: write #This is required for requesting the JWT
-      contents: read #This is required for actions/checkout
-
+    
     steps:
       - name: Download artifact from build job
         uses: actions/download-artifact@v4
         with:
           name: .net-app
       
-      - name: Login to Azure
-        uses: azure/login@v2
-        with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_C285B3F5BA29453D8165ED511F441343 }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_04B7580E5206465E80AF4A8BEF1A967A }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_BE5D954880AF4CB5B27F0B749FF162A5 }}
-
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
         with:
-          app-name: 'storybase'
+          app-name: 'apistorybase'
           slot-name: 'Production'
           package: .
-          
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_5B9C88DE3A5E4B5B8612FB425E148A9A }}
